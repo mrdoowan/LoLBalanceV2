@@ -29,12 +29,17 @@ namespace LoLBalanceV2
             name = name_;
             ign = ign_;
             tier = tier_;
-            if (tier == Tier.MASTER || tier == Tier.CHALLENGER) { division = 1; }
-            else { division = div_; }
+            division = (tier == Tier.MASTER) ? 1 : div_;
             primaryRole = pri_;
             secondRole = sec_;
             assignRole = Role.NONE;
             duo = duo_;
+        }
+
+        // Calculates the value of a Rank.
+        // standard y = mx - b, with b = (lowestRank) - 1
+        public int rankValue(int lowestRank = 1) {
+            return TIER_TO_PTS[this.tier] * 5 + (6 - this.division) - (lowestRank - 1);
         }
 
         // -1 if this rank is lower than Other rank
@@ -55,8 +60,7 @@ namespace LoLBalanceV2
             { Tier.GOLD, 2 },
             { Tier.PLATINUM, 3 },
             { Tier.DIAMOND, 4 },
-            { Tier.MASTER, 5 },
-            { Tier.CHALLENGER, 6 }
+            { Tier.MASTER, 5 }
         };
     }
 }
@@ -71,8 +75,7 @@ namespace LoLBalanceV2
         GOLD,
         PLATINUM,
         DIAMOND,
-        MASTER,
-        CHALLENGER,
+        MASTER
     }
 }
 

@@ -121,6 +121,8 @@ namespace LoLBalanceV2
                 }
                 // For naming purposes, the remaining masterList is now fillList
                 assignRoleList.Add(Role.FILL, masterList.Values.ToList());
+
+
             }
         }
         
@@ -132,7 +134,7 @@ namespace LoLBalanceV2
             { "Platinum", Tier.PLATINUM },
             { "Diamond", Tier.DIAMOND },
             { "Master", Tier.MASTER },
-            { "Challenger", Tier.CHALLENGER }
+            { "Challenger", Tier.MASTER }
         };
 
         // String -> Role
