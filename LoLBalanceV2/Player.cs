@@ -5,14 +5,15 @@ namespace LoLBalanceV2
 {
     public class Player : IComparable<Player>
     {
-        public string name;        // Real name of player (never use this for code)  
-        public string ign;         // Summoner name
+        public string name;         // Real name of player (never use this for code)  
+        public string ign;          // Summoner name
         public Tier tier;
         public int division;
-        public Role primaryRole;   // Primary Role
-        public Role secondRole;    // Secondary Role
-        public Role assignRole;    // The assigned Role when in a team. Initialize to NONE
-        public string duo;         // Leave blank if Solo
+        public Role primaryRole;    // Primary Role
+        public Role secondRole;     // Secondary Role
+        //public Role assignRole;    // The assigned Role when in a team. Initialize to NONE
+        public string duo;          // Leave blank if Solo
+        public bool autoFilled;     // Signify if the player is autofilled
         
         // Default Ctor
         public Player() {
@@ -20,7 +21,7 @@ namespace LoLBalanceV2
             division = 5;
             primaryRole = Role.NONE;
             secondRole = Role.NONE;
-            assignRole = Role.NONE;
+            autoFilled = false;
         }
 
         // Init ctor
@@ -29,17 +30,20 @@ namespace LoLBalanceV2
             name = name_;
             ign = ign_;
             tier = tier_;
-            division = (tier == Tier.MASTER) ? 1 : div_;
+            division = (tier == Tier.MASTER) ? 5 : div_;
             primaryRole = pri_;
             secondRole = sec_;
-            assignRole = Role.NONE;
             duo = duo_;
+            autoFilled = false;
         }
 
         // Calculates the value of a Rank.
         // standard y = mx - b, with b = (lowestRank) - 1
         public int rankValue(int lowestRank = 1) {
-            return TIER_TO_PTS[this.tier] * 5 + (6 - this.division) - (lowestRank - 1);
+            int pts = TIER_TO_PTS[this.tier] * 5 + (6 - this.division);
+            pts -= (lowestRank - 1);
+            pts -= (autoFilled) ? 3 : 0;
+            return (pts < 1) ? 1 : pts;
         }
 
         // -1 if this rank is lower than Other rank

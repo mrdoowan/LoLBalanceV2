@@ -162,7 +162,6 @@ namespace LoLBalanceV2
                 Player player = masterList[ign];
                 Role role = (primaryRole) ? player.primaryRole : player.secondRole;
                 if (role != Role.FILL) {
-                    player.assignRole = role;
                     assignRoleList[role].Add(player);
                     // Remove from masterList
                     // Currently immutabale due to iteration. Remove later
@@ -192,7 +191,6 @@ namespace LoLBalanceV2
                         changePlayer = roleList.Min();
                     }
                     roleList.Remove(changePlayer);
-                    changePlayer.assignRole = Role.NONE;
                     masterList.Add(changePlayer.ign, changePlayer);
                 }
             }
