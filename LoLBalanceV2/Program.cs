@@ -119,7 +119,14 @@ namespace LoLBalanceV2
                         "Reason: " + ex.Message);
                     return;
                 }
-                // For naming purposes, the remaining masterList is now fillList
+                // Assign each remaining masterList into Fill.
+                foreach (Player player in masterList.Values) {
+                    player.assignRole = Role.FILL;
+                    if (player.primaryRole != Role.FILL &&
+                        player.secondRole != Role.FILL) {
+                        player.autoFilled = true;
+                    }
+                }
                 assignRoleList.Add(Role.FILL, masterList.Values.ToList());
 
 
@@ -162,6 +169,7 @@ namespace LoLBalanceV2
                 Player player = masterList[ign];
                 Role role = (primaryRole) ? player.primaryRole : player.secondRole;
                 if (role != Role.FILL) {
+                    player.assignRole = role;
                     assignRoleList[role].Add(player);
                     // Remove from masterList
                     // Currently immutabale due to iteration. Remove later
@@ -191,6 +199,7 @@ namespace LoLBalanceV2
                         changePlayer = roleList.Min();
                     }
                     roleList.Remove(changePlayer);
+                    changePlayer.assignRole = Role.NONE;
                     masterList.Add(changePlayer.ign, changePlayer);
                 }
             }

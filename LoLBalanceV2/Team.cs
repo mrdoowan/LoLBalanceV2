@@ -21,10 +21,11 @@ namespace LoLBalanceV2
             players.Add(Role.MID, mid);
             players.Add(Role.BOT, bot);
             players.Add(Role.SUP, sup);
+            calcTeamValue();
         }
 
         // Return and set team's combined rankValues w/ lowestRank
-        public int calcTeamValue(int lowestRank) {
+        public int calcTeamValue(int lowestRank = 1) {
             int combinedValue = 0;
             foreach (Player player in players.Values) {
                 combinedValue += player.rankValue(lowestRank);

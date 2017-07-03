@@ -11,7 +11,7 @@ namespace LoLBalanceV2
         public int division;
         public Role primaryRole;    // Primary Role
         public Role secondRole;     // Secondary Role
-        //public Role assignRole;    // The assigned Role when in a team. Initialize to NONE
+        public Role assignRole;    // The assigned Role when in a team. Initialize to NONE
         public string duo;          // Leave blank if Solo
         public bool autoFilled;     // Signify if the player is autofilled
         
@@ -42,7 +42,8 @@ namespace LoLBalanceV2
         public int rankValue(int lowestRank = 1) {
             int pts = TIER_TO_PTS[this.tier] * 5 + (6 - this.division);
             pts -= (lowestRank - 1);
-            pts -= (autoFilled) ? 3 : 0;
+            pts = (autoFilled) ? (pts * 3 / 4) : pts;   
+            // Assume they do 25% worse
             return (pts < 1) ? 1 : pts;
         }
 
