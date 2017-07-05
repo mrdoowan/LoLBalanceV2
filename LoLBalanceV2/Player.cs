@@ -11,8 +11,10 @@ namespace LoLBalanceV2
         public int division;
         public Role primaryRole;    // Primary Role
         public Role secondRole;     // Secondary Role
-        public Role assignRole;    // The assigned Role when in a team. Initialize to NONE
+        public Role assignRole;     // The assigned Role when in a team. Initialize to NONE
         public string duo;          // Leave blank if Solo
+        public bool primaryAssigned;// Signify if player's primary was assigned
+        public bool secondAssigned; // Signify if player's secondary was assigned
         public bool autoFilled;     // Signify if the player is autofilled
         
         // Default Ctor
@@ -21,6 +23,8 @@ namespace LoLBalanceV2
             division = 5;
             primaryRole = Role.NONE;
             secondRole = Role.NONE;
+            primaryAssigned = false;
+            secondAssigned = false;
             autoFilled = false;
         }
 
@@ -34,14 +38,15 @@ namespace LoLBalanceV2
             primaryRole = pri_;
             secondRole = sec_;
             duo = duo_;
+            primaryAssigned = false;
+            secondAssigned = false;
             autoFilled = false;
         }
 
         // Calculates the value of a Rank.
         // standard y = mx - b, with b = (lowestRank) - 1
-        public int rankValue(int lowestRank = 1) {
+        public int rankValue() {
             int pts = TIER_TO_PTS[this.tier] * 5 + (6 - this.division);
-            pts -= (lowestRank - 1);
             pts = (autoFilled) ? (pts * 3 / 4) : pts;   
             // Assume they do 25% worse
             return (pts < 1) ? 1 : pts;

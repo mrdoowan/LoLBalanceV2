@@ -58,6 +58,7 @@ namespace LoLBalanceV2
                 }
                 int numTeams = masterList.Count / 5;
                 // ----- Validate duos and their Roles
+                List<string> removeList = new List<string>();
                 foreach (string summoner in duoList.Keys) {
                     try {
                         string duoIGN = duoList[summoner];
@@ -93,9 +94,17 @@ namespace LoLBalanceV2
                     }
                     catch {
                         // Player couldn't be found or incorrect, so we blank out duo
-                        Player player = masterList[summoner];
-                        player.duo = "";
+                        removeList.Add(summoner);
+                        masterList[summoner].duo = "";
                     }
+                }
+                foreach (string key in removeList) {
+                    masterList.Remove(key);
+                }
+                // Make masterList that is never touched
+                Dictionary<string, Player> origMasterList = new Dictionary<string, Player>();
+                foreach (KeyValuePair<string, Player> pair in masterList) {
+                    origMasterList.Add(pair.Key, pair.Value);
                 }
                 // ----- Assign by 5 Roles
                 Dictionary<Role, List<Player>> assignRoleList = new Dictionary<Role, List<Player>>() {
@@ -119,17 +128,46 @@ namespace LoLBalanceV2
                         "Reason: " + ex.Message);
                     return;
                 }
-                // Assign each remaining masterList into Fill.
-                foreach (Player player in masterList.Values) {
-                    player.assignRole = Role.FILL;
-                    if (player.primaryRole != Role.FILL &&
-                        player.secondRole != Role.FILL) {
-                        player.autoFilled = true;
+                // Assign each remaining masterList (in this case it is Fill) to a Role.
+                // The remaining Roles have to be < numTeams. Assign by greedy approach
+                try {
+                    Dictionary<Role, int> roleValues = new Dictionary<Role, int>();
+                    foreach (Role role in assignRoleList.Keys) {
+                        List<Player> rolesList = assignRoleList[role];
+                        if (rolesList.Count < numTeams) {
+                            int roleValue1 = 0;
+                            foreach (Player player in rolesList) {
+                                roleValue1 += player.rankValue();
+                            }
+                            roleValues.Add(role, roleValue1);
+                        }
+                    }
+                    while (masterList.Count > 0) {
+                        List<Player> fillList = masterList.Values.ToList();
+                        Player highestPlayer = fillList.Max();
+                        Role keyRole = roleValues.Aggregate((l, r) => l.Value < r.Value ? l : r).Key;
+                        // This LINQ finds the key of the lowest value in a Dictionary
+                        highestPlayer.assignRole = keyRole;
+                        if (highestPlayer.primaryRole != Role.FILL &&
+                            highestPlayer.secondRole != Role.FILL) {
+                            highestPlayer.autoFilled = true;
+                        }
+                        assignRoleList[keyRole].Add(highestPlayer);
+                        // Check if that role has 'numTeams' players
+                        if (assignRoleList.Count < numTeams) {
+                            roleValues[keyRole] += highestPlayer.rankValue();
+                        }
+                        else {
+                            roleValues.Remove(keyRole);
+                        }
+                        masterList.Remove(highestPlayer.ign);
                     }
                 }
-                assignRoleList.Add(Role.FILL, masterList.Values.ToList());
-
-
+                catch (Exception e) {
+                    Console.WriteLine("ERROR - Assigning fill Roles\n" +
+                        "Reason: " + e.Message);
+                    return;
+                }
             }
         }
         

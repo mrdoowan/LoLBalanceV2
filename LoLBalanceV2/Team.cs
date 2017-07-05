@@ -2,15 +2,17 @@
 
 namespace LoLBalanceV2
 {
-    class Team
+    public class Team
     {
         private Dictionary<Role, Player> players;   // Players in this team. Size strictly 5
         public int teamValue;                       // Combined rank value
+        public int numFill;                         // Number of players filled
 
         // Default ctor
         public Team() {
             players = new Dictionary<Role, Player>();
             teamValue = 0;
+            numFill = 0;
         }
 
         // Init ctor
@@ -25,10 +27,10 @@ namespace LoLBalanceV2
         }
 
         // Return and set team's combined rankValues w/ lowestRank
-        public int calcTeamValue(int lowestRank = 1) {
+        public int calcTeamValue() {
             int combinedValue = 0;
             foreach (Player player in players.Values) {
-                combinedValue += player.rankValue(lowestRank);
+                combinedValue += player.rankValue();
             }
             teamValue = combinedValue;
             return combinedValue;
@@ -43,7 +45,18 @@ namespace LoLBalanceV2
         // Assume TOP, JNG, MID, BOT, SUP as valid inputs
         // Sets the players in that role
         public void setPlayerRole(Role role, Player player) {
-            players[role] = player;
+            if (players.ContainsKey(role)) {
+                players[role] = player;     // Sets
+            }
+            else {
+                players.Add(role, player);  // Adds
+            }
+            calcTeamValue();
+        }
+        
+        // Returns true if team has the role, otherwise false
+        public bool containsRole(Role role) {
+            return players.ContainsKey(role);
         }
     }
 }
