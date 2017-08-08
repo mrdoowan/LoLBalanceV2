@@ -5,7 +5,7 @@ namespace LoLBalanceV2
     class Team
     {
         private Dictionary<Role, Player> players;   // Players in this team. Size strictly 5
-        public int teamValue;                       // Combined rank value
+        private int teamValue;                       // Combined rank value
 
         // Default ctor
         public Team() {

@@ -13,6 +13,8 @@ namespace LoLBalanceV2
         public Role secondRole;     // Secondary Role
         //public Role assignRole;    // The assigned Role when in a team. Initialize to NONE
         public string duo;          // Leave blank if Solo
+        public bool primaryAssigned;// Primary role assigned
+        public bool secondAssigned; // Secondary role assigned
         public bool autoFilled;     // Signify if the player is autofilled
         
         // Default Ctor
@@ -21,6 +23,8 @@ namespace LoLBalanceV2
             division = 5;
             primaryRole = Role.NONE;
             secondRole = Role.NONE;
+            primaryAssigned = false;
+            secondAssigned = false;
             autoFilled = false;
         }
 
@@ -34,6 +38,8 @@ namespace LoLBalanceV2
             primaryRole = pri_;
             secondRole = sec_;
             duo = duo_;
+            primaryAssigned = false;
+            secondAssigned = false;
             autoFilled = false;
         }
 
@@ -42,8 +48,20 @@ namespace LoLBalanceV2
         public int rankValue(int lowestRank = 1) {
             int pts = TIER_TO_PTS[this.tier] * 5 + (6 - this.division);
             pts -= (lowestRank - 1);
-            pts -= (autoFilled) ? 3 : 0;
+            // Any players filled or get their secondary role will be 10% lower
+            if (primaryRole == Role.FILL || secondAssigned) {
+                pts = pts * 9 / 10;
+            }
+            // Players that are autofilled will be 30% lower
+            else if (autoFilled) {
+                pts = pts * 7 / 10;
+            }
             return (pts < 1) ? 1 : pts;
+        }
+
+        // so that string.IsNullorWhite fxn isn't overkilled
+        public bool hasDuo() {
+            return (string.IsNullOrWhiteSpace(duo));
         }
 
         // -1 if this rank is lower than Other rank
