@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LoLBalanceV2
 {
+    [Serializable]
     class Team
     {
         private Dictionary<Role, Player> players;   // Players in this team. Size strictly 5
-        private int teamValue;                       // Combined rank value
+        private int teamValue;                      // Combined rank value
 
         // Default ctor
         public Team() {
@@ -16,6 +18,7 @@ namespace LoLBalanceV2
         // Init ctor
         public Team(Player top, Player jng, Player mid,
             Player bot, Player sup) {
+            players = new Dictionary<Role, Player>();
             players.Add(Role.TOP, top);
             players.Add(Role.JNG, jng);
             players.Add(Role.MID, mid);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace LoLBalanceV2
 {
+    [Serializable]
     public class Player : IComparable<Player>
     {
         public string name;         // Real name of player (never use this for code)  
@@ -11,11 +12,22 @@ namespace LoLBalanceV2
         public int division;
         public Role primaryRole;    // Primary Role
         public Role secondRole;     // Secondary Role
-        //public Role assignRole;    // The assigned Role when in a team. Initialize to NONE
+        public Role assignedRole;   // The assigned Role when in a team. Initialize to NONE
         public string duo;          // Leave blank if Solo
-        public bool primaryAssigned;// Primary role assigned
-        public bool secondAssigned; // Secondary role assigned
-        public bool autoFilled;     // Signify if the player is autofilled
+
+        // Return boolean getters
+        public bool isPrimaryAssigned() {
+            return primaryRole == assignedRole;
+        }
+        public bool isSecondaryAssigned() {
+            return secondRole == assignedRole;
+        }
+        public bool isAutoFilled() {
+            return primaryRole != Role.FILL &&
+                secondRole != Role.FILL &&
+                primaryRole != assignedRole &&
+                secondRole != assignedRole;
+        }
         
         // Default Ctor
         public Player() {
@@ -23,9 +35,7 @@ namespace LoLBalanceV2
             division = 5;
             primaryRole = Role.NONE;
             secondRole = Role.NONE;
-            primaryAssigned = false;
-            secondAssigned = false;
-            autoFilled = false;
+            assignedRole = Role.NONE;
         }
 
         // Init ctor
@@ -38,9 +48,7 @@ namespace LoLBalanceV2
             primaryRole = pri_;
             secondRole = sec_;
             duo = duo_;
-            primaryAssigned = false;
-            secondAssigned = false;
-            autoFilled = false;
+            assignedRole = Role.NONE;
         }
 
         // Calculates the value of a Rank.
@@ -49,11 +57,11 @@ namespace LoLBalanceV2
             int pts = TIER_TO_PTS[this.tier] * 5 + (6 - this.division);
             pts -= (lowestRank - 1);
             // Any players filled or get their secondary role will be 10% lower
-            if (primaryRole == Role.FILL || secondAssigned) {
+            if (primaryRole == Role.FILL || isSecondaryAssigned()) {
                 pts = pts * 9 / 10;
             }
             // Players that are autofilled will be 30% lower
-            else if (autoFilled) {
+            else if (isAutoFilled()) {
                 pts = pts * 7 / 10;
             }
             return (pts < 1) ? 1 : pts;

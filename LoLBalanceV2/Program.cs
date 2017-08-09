@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 
 namespace LoLBalanceV2
@@ -143,10 +144,7 @@ namespace LoLBalanceV2
                     // Find role with smallest points, and add highest Ranked player
                     Role addFillRole = roleMinPointsFill(assignRoleList, numTeams);
                     Player addPlayer = masterList.Values.ToList().Max();
-                    if (addPlayer.primaryRole != Role.FILL && 
-                        addPlayer.secondRole != Role.FILL) {
-                        addPlayer.autoFilled = true;
-                    }
+                    addPlayer.assignedRole = addFillRole;
                     assignRoleList[addFillRole].Add(addPlayer);
                     masterList.Remove(addPlayer.ign.ToLower());
                 }
@@ -159,23 +157,11 @@ namespace LoLBalanceV2
                 }
 
                 // ---- PART 3: BALANCING
-                // For random purposes, randomize the order in each role.
-                foreach (Role role in assignRoleList.Keys) {
-                    for (int i = 0; i < RANDOMIZE; ++i) {
-                        List<Player> rolePlayers = assignRoleList[role];
-                        int pos1 = randomNumber(0, numTeams, SEED);
-                        int pos2 = randomNumber(0, numTeams, SEED);
-                        Player temp = new Player();
-                        temp = rolePlayers[pos1];
-                        rolePlayers[pos1] = rolePlayers[pos2];
-                        rolePlayers[pos2] = temp;
-                    }
-                }
-
+                // Initialize the Teams
                 int lowestRankVal = lowestPlayer.rankValue();
                 int lowestRange = 0;
-                Balance currBalance = new Balance(assignRoleList, numTeams, lowestRankVal, out lowestRange);
-                Balance bestBalance = new Balance(assignRoleList, numTeams, lowestRankVal, out lowestRange);
+                Balance currBalance = new Balance(assignRoleList, duoList, lowestRankVal, out lowestRange);
+                Balance bestBalance = deepClone(currBalance);
                 int rolesRemain = 5;
                 // All queues acting as a clock queue
                 Queue<Role> roleQ = new Queue<Role>();
@@ -234,6 +220,16 @@ namespace LoLBalanceV2
             { "Fill", Role.FILL }
         };
 
+        // Deep Copy function
+        public static T deepClone<T>(T obj) {
+            using (var ms = new MemoryStream()) {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(ms, obj);
+                ms.Position = 0;
+                return (T)formatter.Deserialize(ms);
+            }
+        }
+
         // Rolls a uniform random number between min and max
         private static int randomNumber(int min, int max, int seedVal) {
             Random rnd = new Random(seedVal);
@@ -245,14 +241,14 @@ namespace LoLBalanceV2
             ref Dictionary<Role, List<Player>> assignRoleList,
             Dictionary<string, string> duoList,
             int numTeams, bool primaryRole) {
+            // Fxn start
             List<string> removeList = new List<string>();
             foreach (string ign in masterList.Keys) {
                 Player player = masterList[ign];
-                Player duoPlayer = masterList[duoList[ign]];
+                string duoName = duoList[ign];
                 Role role = (primaryRole) ? player.primaryRole : player.secondRole;
-                if (role != Role.FILL && !assignRoleList[role].Contains(duoPlayer)) {
-                    if (primaryRole) { player.primaryAssigned = true; }
-                    else { player.secondAssigned = true; }
+                if (role != Role.FILL && !containsName(assignRoleList[role], duoName)) {
+                    player.assignedRole = role;
                     assignRoleList[role].Add(player);
                     // Remove from masterList
                     // Currently immutabale due to iteration. Remove later
@@ -269,8 +265,7 @@ namespace LoLBalanceV2
                     // Used to determine who gets kicked
                     Player changePlayer = roleChange(ROLE_CHANGE_OPTION, roleList, primaryRole);
                     roleList.Remove(changePlayer);
-                    changePlayer.primaryAssigned = false;
-                    changePlayer.secondAssigned = false;
+                    changePlayer.assignedRole = Role.NONE;
                     masterList.Add(changePlayer.ign.ToLower(), changePlayer);
                 }
             }
@@ -284,7 +279,7 @@ namespace LoLBalanceV2
             List<Player> roleSecList = new List<Player>();
             if (!primary) {
                 foreach (Player addPlayer in roleList) {
-                    if (addPlayer.secondAssigned) {
+                    if (addPlayer.isSecondaryAssigned()) {
                         roleSecList.Add(addPlayer);
                     }
                 }
@@ -326,6 +321,15 @@ namespace LoLBalanceV2
                 }
             }
             return retRole;
+        }
+
+        private static bool containsName(List<Player> roleList, string name) {
+            foreach (Player player in roleList) {
+                if (player.ign.ToLower() == name.ToLower()) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
