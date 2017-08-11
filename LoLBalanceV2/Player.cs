@@ -69,7 +69,7 @@ namespace LoLBalanceV2
 
         // so that string.IsNullorWhite fxn isn't overkilled
         public bool hasDuo() {
-            return (string.IsNullOrWhiteSpace(duo));
+            return (!string.IsNullOrWhiteSpace(duo));
         }
 
         // -1 if this rank is lower than Other rank

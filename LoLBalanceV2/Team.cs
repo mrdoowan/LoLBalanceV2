@@ -47,5 +47,45 @@ namespace LoLBalanceV2
         public void setPlayerRole(Role role, Player player) {
             players[role] = player;
         }
+
+        // Returns true if ign is in the Team
+        public bool isNameInTeam(string ign) {
+            foreach (Player player in players.Values) {
+                if (player.ign.ToLower() == ign.ToLower()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Returns a solo player with preference of primary and secondary
+        // in the team
+        public Player aSoloPlayerFromTeam(Role primary, Role second) {
+            if (!players[primary].hasDuo()) { return players[primary]; }
+            if (!players[second].hasDuo()) { return players[second]; }
+            List<Player> soloPlayers = new List<Player>();
+            foreach (Player player in players.Values) {
+                if (!player.hasDuo()) {
+                    soloPlayers.Add(player);
+                }
+            }
+            if (soloPlayers.Count == 0) {
+                Console.WriteLine("ERROR - An entire team has no solo?");
+                throw new Exception();
+            }
+            Random rnd = new Random();
+            return soloPlayers[rnd.Next(0, soloPlayers.Count - 1)];
+        }
+
+        // Returns the number of solo players the team has
+        public int numSoloPlayers() {
+            int solo = 0;
+            foreach (Player player in players.Values) {
+                if (!player.hasDuo()) {
+                    solo++;
+                }
+            }
+            return solo;
+        }
     }
 }
