@@ -50,7 +50,7 @@ namespace LoLBalanceV2
             alignDuoRole(Role.JNG);
             alignDuoRole(Role.MID);
             alignDuoRole(Role.BOT);
-            // We can assume Support is already aligned
+            alignDuoRole(Role.SUP);
             lowestRankVal = lowestRank_;
             calcRange();
             range = rangeBalance;
@@ -73,8 +73,8 @@ namespace LoLBalanceV2
             foreach (Role roleLoop in roleList) {
                 player1 = teams[team1].getPlayerRole(roleLoop);
                 player2 = teams[team2].getPlayerRole(roleLoop);
-                teams[team1].setPlayerRole(role, player2);
-                teams[team2].setPlayerRole(role, player1);
+                teams[team1].setPlayerRole(roleLoop, player2);
+                teams[team2].setPlayerRole(roleLoop, player1);
             }
             if (withDuo) { calcRange(); }
             return rangeBalance;
@@ -144,18 +144,20 @@ namespace LoLBalanceV2
                             // Now need to check if teams[i].Player(duoRole) has a duo
                             // AND if that duo is in teams[i] (save that person's role)
                             Player swapPlayer = teams[i].getPlayerRole(duoRole);
-                            Player swapPlayerDuo = roster[swapPlayer.ign.ToLower()];
-                            if (swapPlayer.hasDuo() && teams[i].isNameInTeam(swapPlayerDuo.ign)) {
-                                // If this condition is true, find two solos within those roles
-                                // Swap those two with ogTeam. 
-                                // This is one of the worst corner cases ever
-                                Role swapPlayerDuoRole = swapPlayerDuo.assignedRole;
-                                for (int k = 0; k < teams.Count; ++k) {
-                                    if (!teams[k].getPlayerRole(duoRole).hasDuo() &&
-                                        !teams[k].getPlayerRole(swapPlayerDuoRole).hasDuo()) {
-                                        switchPlayer(duoRole, i, k, false);
-                                        switchPlayer(swapPlayerDuoRole, i, k, false);
-                                        break;
+                            if (swapPlayer.hasDuo()) {
+                                Player swapPlayerDuo = roster[swapPlayer.duo.ToLower()];
+                                if (teams[i].isNameInTeam(swapPlayerDuo.ign)) {
+                                    // If this condition is true, find two solos within those roles
+                                    // Swap those two with ogTeam. 
+                                    // This is one of the worst corner cases ever
+                                    Role swapPlayerDuoRole = swapPlayerDuo.assignedRole;
+                                    for (int k = 0; k < teams.Count; ++k) {
+                                        if (!teams[k].getPlayerRole(duoRole).hasDuo() &&
+                                            !teams[k].getPlayerRole(swapPlayerDuoRole).hasDuo()) {
+                                            switchPlayer(duoRole, i, k, false);
+                                            switchPlayer(swapPlayerDuoRole, i, k, false);
+                                            break;
+                                        }
                                     }
                                 }
                             }

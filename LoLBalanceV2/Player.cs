@@ -20,7 +20,9 @@ namespace LoLBalanceV2
             return primaryRole == assignedRole;
         }
         public bool isSecondaryAssigned() {
-            return secondRole == assignedRole;
+            return secondRole == assignedRole ||
+                (primaryRole != assignedRole &&
+                secondRole == Role.FILL);
         }
         public bool isAutoFilled() {
             return primaryRole != Role.FILL &&

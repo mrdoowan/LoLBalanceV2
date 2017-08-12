@@ -46,6 +46,7 @@ namespace LoLBalanceV2
         // Sets the players in that role
         public void setPlayerRole(Role role, Player player) {
             players[role] = player;
+            player.assignedRole = role;
         }
 
         // Returns true if ign is in the Team

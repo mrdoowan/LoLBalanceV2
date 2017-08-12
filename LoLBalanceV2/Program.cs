@@ -10,9 +10,9 @@ namespace LoLBalanceV2
     class Program
     {
         private const int ROLE_CHANGE_OPTION = 1;
-        private const int SEED = 11;
+        private const int SEED = 1151;
         private const int RANDOMIZE = 10;
-        private const int RANGE_THRESHOLD = 2;
+        private const int RANGE_THRESHOLD = 3;
 
         [STAThread]
         // Main Application
