@@ -27,10 +27,10 @@ namespace LoLBalanceV2
         }
 
         // Return and set team's combined rankValues w/ lowestRank
-        public int calcTeamValue(int lowestRank) {
+        public int calcTeamValue() {
             int combinedValue = 0;
             foreach (Player player in players.Values) {
-                combinedValue += player.rankValue(lowestRank);
+                combinedValue += player.rankValue(true);
             }
             teamValue = combinedValue;
             return combinedValue;

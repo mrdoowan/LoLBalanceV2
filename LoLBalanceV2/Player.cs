@@ -54,17 +54,19 @@ namespace LoLBalanceV2
         }
 
         // Calculates the value of a Rank.
+        // True takes assignedRole into account, False does not
         // standard y = mx - b, with b = (lowestRank) - 1
-        public int rankValue(int lowestRank = 1) {
+        public int rankValue(bool roleAffect) {
             int pts = TIER_TO_PTS[this.tier] * 5 + (6 - this.division);
-            pts -= (lowestRank - 1);
-            // Any players filled or get their secondary role will be 10% lower
-            if (primaryRole == Role.FILL || isSecondaryAssigned()) {
-                pts = pts * 9 / 10;
-            }
-            // Players that are autofilled will be 30% lower
-            else if (isAutoFilled()) {
-                pts = pts * 7 / 10;
+            if (roleAffect) {
+                // Any players filled or get their secondary role will be 10% lower
+                if (primaryRole == Role.FILL || isSecondaryAssigned()) {
+                    pts = pts * 9 / 10;
+                }
+                // Players that are autofilled will be 30% lower
+                else if (isAutoFilled()) {
+                    pts = pts * 7 / 10;
+                }
             }
             return (pts < 1) ? 1 : pts;
         }

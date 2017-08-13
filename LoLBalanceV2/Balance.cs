@@ -9,7 +9,6 @@ namespace LoLBalanceV2
         public List<Team> teams;
         private Dictionary<string, Player> roster;    // Complete roster loaded here
         private int rangeBalance;       // This is the difference between max and min of teamValues
-        private int lowestRankVal;
         private int maxTeamIndex;
         private int minTeamIndex;
 
@@ -18,14 +17,12 @@ namespace LoLBalanceV2
             teams = new List<Team>();
             roster = new Dictionary<string, Player>();
             rangeBalance = 0;
-            lowestRankVal = 0;
             maxTeamIndex = 0;
             minTeamIndex = 0;
         }
 
         // Init ctor
-        public Balance(Dictionary<Role, List<Player>> roleList, 
-            int lowestRank_, out int range) {
+        public Balance(Dictionary<Role, List<Player>> roleList, out int range) {
             // Fxn start
             teams = new List<Team>();
             roster = new Dictionary<string, Player>();
@@ -50,7 +47,6 @@ namespace LoLBalanceV2
             alignDuoRole(Role.MID);
             alignDuoRole(Role.BOT);
             alignDuoRole(Role.SUP);
-            lowestRankVal = lowestRank_;
             calcRange();
             range = rangeBalance;
         }
@@ -98,7 +94,7 @@ namespace LoLBalanceV2
         private void calcRange() {
             int maxVal = 0, minVal = 9000;
             for (int i = 0; i < teams.Count; ++i) {
-                int teamVal = teams[i].calcTeamValue(lowestRankVal);
+                int teamVal = teams[i].calcTeamValue();
                 if (teamVal > maxVal) {
                     maxVal = teamVal;
                     maxTeamIndex = i;
