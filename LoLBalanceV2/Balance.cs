@@ -25,7 +25,6 @@ namespace LoLBalanceV2
 
         // Init ctor
         public Balance(Dictionary<Role, List<Player>> roleList, 
-            Dictionary<string, string> duoList_,
             int lowestRank_, out int range) {
             // Fxn start
             teams = new List<Team>();
@@ -57,8 +56,8 @@ namespace LoLBalanceV2
         }
 
         // Switch player team1 and player team2 based on role
-        // team1 is the original player being examined 
-        // Returns the new range
+        // team1 is the original player being examined.
+        // Returns the new range. Also switches duos
         public int switchPlayer(Role role, int team1, int team2, bool withDuo = true) {
             // Figure out how many Roles need to be switched based on duos
             HashSet<Role> roleList = new HashSet<Role>();

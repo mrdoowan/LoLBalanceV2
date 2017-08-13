@@ -10,9 +10,10 @@ namespace LoLBalanceV2
     class Program
     {
         private const int ROLE_CHANGE_OPTION = 1;
-        private const int SEED = 1151;
+        private const int SEED = 60;
         private const int RANDOMIZE = 10;
         private const int RANGE_THRESHOLD = 3;
+        private const int NUM_ROLES = 5;
 
         [STAThread]
         // Main Application
@@ -62,11 +63,11 @@ namespace LoLBalanceV2
                     Console.WriteLine("ERROR - Total number of Players does not exceed 40");
                     return;
                 }
-                if (masterList.Count % 5 != 0) {
+                if (masterList.Count % NUM_ROLES != 0) {
                     Console.WriteLine("ERROR - Total number of Players is not divisible by 5");
                     return;
                 }
-                int numTeams = masterList.Count / 5;
+                int numTeams = masterList.Count / NUM_ROLES;
                 // ----- Validate duos and their Roles
                 List<string> noDuoList = new List<string>();
                 foreach (string summoner in duoList.Keys) {
@@ -161,8 +162,10 @@ namespace LoLBalanceV2
                 int lowestRankVal = lowestPlayer.rankValue();
                 int lowestRange = 0;
                 Balance currBalance = new Balance(assignRoleList, duoList, lowestRankVal, out lowestRange);
-                Balance bestBalance = deepClone(currBalance);
-                int rolesRemain = 5;
+                Balance bestBalance = new Balance();
+                int currMaxIndex = currBalance.getMaxTeamIndex();
+                int currMinIndex = currBalance.getMinTeamIndex();
+                int rolesRemain = NUM_ROLES;
                 // All queues acting as a clock queue
                 Queue<Role> roleQ = new Queue<Role>();
                 roleQ.Enqueue(Role.TOP); roleQ.Enqueue(Role.JNG); roleQ.Enqueue(Role.MID);
@@ -182,19 +185,73 @@ namespace LoLBalanceV2
                 // If lowestRange changes: both checkRemaining set back to numTeams
                 // Break entirely if: 
                 // 1) lowestRange <= THRESHOLD
-                // -- Remember to move duos too!
-                while (rolesRemain == 0) {
+
+                int loops = 0; // FOR DEBUGGING
+                while (rolesRemain > 0) {
                     Role checkRole = roleQ.Peek();
                     int minCheckRemain = numTeams, maxCheckRemain = numTeams;
-                    bool minCheck = true, thresholdReached = false;
+                    bool minFlag = true, thresholdReached = false;
                     // Check within each Role
                     while (minCheckRemain > 0 && maxCheckRemain > 0) {
-
+                        loops++;
+                        // Work on minIndex first
+                        int swapIndex = (minFlag) ? minIndexQ.Peek() : maxIndexQ.Peek();
+                        int newRange = (minFlag) ?
+                            currBalance.switchPlayer(checkRole, currMinIndex, swapIndex) :
+                            currBalance.switchPlayer(checkRole, currMaxIndex, swapIndex);
+                        if (newRange <= RANGE_THRESHOLD) {
+                            // Condition 1: Threshold met.
+                            bestBalance = deepClone(currBalance);
+                            thresholdReached = true;
+                            break;
+                        }
+                        else if (newRange < lowestRange) {
+                            // Condition 2: New minRange
+                            bestBalance = deepClone(currBalance);
+                            currMinIndex = currBalance.getMinTeamIndex();
+                            currMaxIndex = currBalance.getMaxTeamIndex();
+                            lowestRange = newRange;
+                            minCheckRemain = numTeams;
+                            maxCheckRemain = numTeams;
+                            rolesRemain = NUM_ROLES;
+                            minFlag = true;
+                        }
+                        else {
+                            // Condition 3: Continue iterating. Switch currBalance back
+                            if (minFlag) {
+                                minCheckRemain--;
+                                currBalance.switchPlayer(checkRole, currMinIndex, swapIndex);
+                            }
+                            else {
+                                maxCheckRemain--;
+                                currBalance.switchPlayer(checkRole, currMaxIndex, swapIndex);
+                            }
+                            if (minCheckRemain == 0) { minFlag = false; }
+                        }
+                        // Cycle through the clock queue
+                        if (minFlag) {
+                            minIndexQ.Dequeue();
+                            minIndexQ.Enqueue(swapIndex);
+                        }
+                        else {
+                            maxIndexQ.Dequeue();
+                            maxIndexQ.Enqueue(swapIndex);
+                        }
                     }
+                    // Made it to the end of a complete role check
                     if (thresholdReached) { break; }
                     rolesRemain--;
                     roleQ.Dequeue();
                     roleQ.Enqueue(checkRole);
+                }
+
+                // ---- PART 4: OUTPUT BEST
+                // If we got to this point, that means bestBalance has our best teams
+                if (MessageBox.Show("A balance was found with a Range of " + lowestRange +
+                    ". It went through " + loops + " iterations.\nWould you like to save it?", 
+                    "Finished", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+
+
                 }
             }
         }
