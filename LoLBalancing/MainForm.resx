@@ -452,12 +452,6 @@
   <metadata name="duo_Col.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="label7.Text" xml:space="preserve">
-    <value>Minimum of 40 Players.
-Suggested threshold = floor(# of Players / 15). Lower number == Better results
-This tests different seed values from (START) to (START + MAX_CHECKS)
-Random variable just randomly swaps before balancing, this might not do anything but go try your luck.</value>
-  </data>
   <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>

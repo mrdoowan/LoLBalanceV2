@@ -27,8 +27,8 @@
 		private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -54,10 +54,7 @@
             this.richTextBox_Console = new System.Windows.Forms.RichTextBox();
             this.button_Balance = new System.Windows.Forms.Button();
             this.groupBox_Setting = new System.Windows.Forms.GroupBox();
-            this.label9 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.numeric_RandVar = new System.Windows.Forms.NumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
             this.numeric_Threshold = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
@@ -70,6 +67,7 @@
             this.label_Version = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.label_StatsMsg = new System.Windows.Forms.Label();
+            this.checkBox_WriteRange = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -77,7 +75,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Players)).BeginInit();
             this.tabPage2.SuspendLayout();
             this.groupBox_Setting.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numeric_RandVar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_Threshold)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_MaxChecks)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_StartSeed)).BeginInit();
@@ -196,14 +193,14 @@
             this.dataGridView_Players.AllowUserToDeleteRows = false;
             this.dataGridView_Players.AllowUserToResizeRows = false;
             this.dataGridView_Players.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView_Players.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView_Players.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridView_Players.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView_Players.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.X_Col,
@@ -235,8 +232,8 @@
             // name_Col
             // 
             this.name_Col.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            this.name_Col.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            this.name_Col.DefaultCellStyle = dataGridViewCellStyle6;
             this.name_Col.HeaderText = "Name";
             this.name_Col.MinimumWidth = 120;
             this.name_Col.Name = "name_Col";
@@ -354,10 +351,8 @@
             // 
             // groupBox_Setting
             // 
-            this.groupBox_Setting.Controls.Add(this.label9);
+            this.groupBox_Setting.Controls.Add(this.checkBox_WriteRange);
             this.groupBox_Setting.Controls.Add(this.label7);
-            this.groupBox_Setting.Controls.Add(this.label6);
-            this.groupBox_Setting.Controls.Add(this.numeric_RandVar);
             this.groupBox_Setting.Controls.Add(this.label5);
             this.groupBox_Setting.Controls.Add(this.numeric_Threshold);
             this.groupBox_Setting.Controls.Add(this.label4);
@@ -374,16 +369,6 @@
             this.groupBox_Setting.TabStop = false;
             this.groupBox_Setting.Text = "Settings";
             // 
-            // label9
-            // 
-            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(313, 15);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(132, 22);
-            this.label9.TabIndex = 21;
-            this.label9.Text = "Autofill Options";
-            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // label7
             // 
             this.label7.ForeColor = System.Drawing.Color.DodgerBlue;
@@ -391,34 +376,10 @@
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(605, 57);
             this.label7.TabIndex = 19;
-            this.label7.Text = resources.GetString("label7.Text");
+            this.label7.Text = "Minimum of 40 Players.\r\nSuggested threshold = floor(# of Players / 15). Lower num" +
+    "ber == Better results\r\nThis tests different seed values from (START) to (START +" +
+    " MAX_CHECKS)\r\n";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // label6
-            // 
-            this.label6.Location = new System.Drawing.Point(64, 95);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(243, 22);
-            this.label6.TabIndex = 18;
-            this.label6.Text = "Random Variable";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // numeric_RandVar
-            // 
-            this.numeric_RandVar.Location = new System.Drawing.Point(6, 97);
-            this.numeric_RandVar.Maximum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            this.numeric_RandVar.Name = "numeric_RandVar";
-            this.numeric_RandVar.Size = new System.Drawing.Size(52, 20);
-            this.numeric_RandVar.TabIndex = 17;
-            this.numeric_RandVar.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
             // 
             // label5
             // 
@@ -426,7 +387,7 @@
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(243, 20);
             this.label5.TabIndex = 16;
-            this.label5.Text = "Threshold range for best Balance";
+            this.label5.Text = "Desired threshold range for Balance";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // numeric_Threshold
@@ -447,19 +408,19 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(243, 20);
             this.label4.TabIndex = 14;
-            this.label4.Text = "Max number of checks (pref 250)";
+            this.label4.Text = "Max number of checks (pref 100)";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // numeric_MaxChecks
             // 
             this.numeric_MaxChecks.Location = new System.Drawing.Point(6, 45);
             this.numeric_MaxChecks.Maximum = new decimal(new int[] {
-            1000,
+            500,
             0,
             0,
             0});
             this.numeric_MaxChecks.Minimum = new decimal(new int[] {
-            100,
+            50,
             0,
             0,
             0});
@@ -467,7 +428,7 @@
             this.numeric_MaxChecks.Size = new System.Drawing.Size(52, 20);
             this.numeric_MaxChecks.TabIndex = 13;
             this.numeric_MaxChecks.Value = new decimal(new int[] {
-            250,
+            100,
             0,
             0,
             0});
@@ -475,7 +436,7 @@
             // radioButton_Low
             // 
             this.radioButton_Low.AutoSize = true;
-            this.radioButton_Low.Location = new System.Drawing.Point(313, 86);
+            this.radioButton_Low.Location = new System.Drawing.Point(310, 63);
             this.radioButton_Low.Name = "radioButton_Low";
             this.radioButton_Low.Size = new System.Drawing.Size(161, 17);
             this.radioButton_Low.TabIndex = 12;
@@ -485,7 +446,7 @@
             // radioButton_High
             // 
             this.radioButton_High.AutoSize = true;
-            this.radioButton_High.Location = new System.Drawing.Point(313, 63);
+            this.radioButton_High.Location = new System.Drawing.Point(310, 40);
             this.radioButton_High.Name = "radioButton_High";
             this.radioButton_High.Size = new System.Drawing.Size(165, 17);
             this.radioButton_High.TabIndex = 11;
@@ -496,7 +457,7 @@
             // 
             this.radioButton_Best.AutoSize = true;
             this.radioButton_Best.Checked = true;
-            this.radioButton_Best.Location = new System.Drawing.Point(313, 40);
+            this.radioButton_Best.Location = new System.Drawing.Point(310, 17);
             this.radioButton_Best.Name = "radioButton_Best";
             this.radioButton_Best.Size = new System.Drawing.Size(202, 17);
             this.radioButton_Best.TabIndex = 10;
@@ -561,6 +522,16 @@
             this.label_StatsMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.label_StatsMsg.Visible = false;
             // 
+            // checkBox_WriteRange
+            // 
+            this.checkBox_WriteRange.AutoSize = true;
+            this.checkBox_WriteRange.Location = new System.Drawing.Point(310, 86);
+            this.checkBox_WriteRange.Name = "checkBox_WriteRange";
+            this.checkBox_WriteRange.Size = new System.Drawing.Size(206, 17);
+            this.checkBox_WriteRange.TabIndex = 21;
+            this.checkBox_WriteRange.Text = "Write other possible ranges in Console";
+            this.checkBox_WriteRange.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -587,7 +558,6 @@
             this.tabPage2.ResumeLayout(false);
             this.groupBox_Setting.ResumeLayout(false);
             this.groupBox_Setting.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numeric_RandVar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_Threshold)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_MaxChecks)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_StartSeed)).EndInit();
@@ -633,11 +603,9 @@
         private System.Windows.Forms.RadioButton radioButton_Best;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown numeric_StartSeed;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.NumericUpDown numeric_RandVar;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.CheckBox checkBox_WriteRange;
     }
 }
 

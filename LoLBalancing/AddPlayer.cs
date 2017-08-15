@@ -17,20 +17,13 @@ namespace LoLBalancing
 		}
 
 		private bool button_pressed = false;
+        private string primary = "";
+        private string secondary = "";
 
 		public void AddDialog(ref DataGridView player_dgv) {
 			this.ShowDialog();
 			if (button_pressed) {
 				DataGridViewButtonColumn button = new DataGridViewButtonColumn();
-                string primary = "", secondary = "";
-				foreach (Control c in groupBox_PrimaryRoles.Controls) {
-                    RadioButton rb = (RadioButton)c;
-                    if (rb.Checked) { primary = rb.Text; }
-                }
-                foreach (Control c in groupBox_SecondaryRoles.Controls) {
-                    RadioButton rb = (RadioButton)c;
-                    if (rb.Checked) { secondary = rb.Text; }
-                }
 				// Add into DataGridView
 				player_dgv.Rows.Add(button, textBox_Name.Text, textBox_IGN.Text, comboBox_Tier.Text, 
                     numericUpDown_Div.Value.ToString(), primary, secondary, textBox_Duo.Text);
@@ -77,7 +70,6 @@ namespace LoLBalancing
             try { textBox_IGN.Text = Players.SelectedRows[0].Cells[2].Value.ToString(); } catch { }
             try { comboBox_Tier.Text = Players.SelectedRows[0].Cells[3].Value.ToString(); } catch { }
             try { numericUpDown_Div.Value = int.Parse(Players.SelectedRows[0].Cells[4].Value.ToString()); } catch { }
-            string primary = "", secondary = "";
             try { primary = Players.SelectedRows[0].Cells[5].Value.ToString(); } catch { }
             try { secondary = Players.SelectedRows[0].Cells[6].Value.ToString(); } catch { }
             foreach (Control c in groupBox_PrimaryRoles.Controls) {
@@ -92,14 +84,6 @@ namespace LoLBalancing
 			this.ShowDialog();
 			// Copy and paste from above
 			if (button_pressed) {
-                foreach (Control c in groupBox_PrimaryRoles.Controls) {
-                    RadioButton rb = (RadioButton)c;
-                    if (rb.Checked) { primary = rb.Text; }
-                }
-                foreach (Control c in groupBox_SecondaryRoles.Controls) {
-                    RadioButton rb = (RadioButton)c;
-                    if (rb.Checked) { secondary = rb.Text; }
-                }
                 // Edit into DataGridView
                 Players.SelectedRows[0].Cells[1].Value = textBox_Name.Text;
 				Players.SelectedRows[0].Cells[2].Value = textBox_IGN.Text;
@@ -144,8 +128,35 @@ namespace LoLBalancing
 		}
 
 		private void button_OK_Click(object sender, EventArgs e) {
-			button_pressed = true;
-			this.Close();
+            foreach (Control c in groupBox_PrimaryRoles.Controls) {
+                RadioButton rb = (RadioButton)c;
+                if (rb.Checked) { primary = rb.Text; }
+            }
+            foreach (Control c in groupBox_SecondaryRoles.Controls) {
+                RadioButton rb = (RadioButton)c;
+                if (rb.Checked) { secondary = rb.Text; }
+            }
+            // Do checks
+            if (string.IsNullOrWhiteSpace(textBox_Name.Text)) {
+                MessageBox.Show("Please provide a name for the Player", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (string.IsNullOrWhiteSpace(textBox_IGN.Text)) {
+                MessageBox.Show("Please provide a summoner IGN for the Player", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (string.IsNullOrWhiteSpace(comboBox_Tier.Text)) {
+                MessageBox.Show("Please provide a Tier for the Player", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (primary == secondary && primary != "Fill") {
+                MessageBox.Show("A Player should not have the same primary and secondary role.", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else {
+                button_pressed = true;
+                this.Close();
+            }
 		}
     }
 }

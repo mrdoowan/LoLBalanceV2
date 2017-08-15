@@ -16,6 +16,7 @@ namespace LoLBalancing
         }
 
         #region Variables and Structs
+
         // Constants
         private const int NUM_PLAYERS = 5;
         private const int MAX_PLAYERS_SCROLL = 12;
@@ -23,8 +24,8 @@ namespace LoLBalancing
         private const int SCROLLBAR_WIDTH = 17;
 
         // Variables for upgrading
-        static private bool upgrading = false;
-        private const string VERSION = "2.0.0";
+        //static private bool upgrading = false;
+        private const string VERSION = "2.0";
 
         // Color Codes for Ranks
         public const string UNRANKHEX = "#B4A7D6";
@@ -117,13 +118,15 @@ namespace LoLBalancing
 
         private void MainForm_Load(object sender, EventArgs e) {
             label_Version.Text = "v" + VERSION + " by Steven Duan (sduans@umich.edu)";
-            // Load Properties.Settings
+            // Find a way to resize between different computers
+            // https://stackoverflow.com/questions/8691951/can-the-datagridview-header-automatically-resize-itself
             
+            // Load Properties.Settings
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
             // Save into Properties.Settings
-            Properties.Settings.Default.Save();
+            // Properties.Settings.Default.Save();
         }
 
         #endregion
@@ -348,13 +351,13 @@ namespace LoLBalancing
         // Removing a Player
         private void dataGridView_Players_CellContentClick(object sender, DataGridViewCellEventArgs e) {
             DataGridView Grid = (DataGridView)sender;
-            if (e.RowIndex > 0) {
-                DataGridViewRow Player = Grid.Rows[e.RowIndex];
+            if (e.RowIndex >= 0) {
+                DataGridViewRow playerRow = Grid.Rows[e.RowIndex];
                 if (Grid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0) {
                     // Button Clicked for that row.
-                    string message = "Do you want to remove \"" + Player.Cells[1].Value.ToString() + "\"?";
+                    string message = "Do you want to remove \"" + playerRow.Cells[1].Value.ToString() + "\"?";
                     if (MessageBox.Show(message, "Reminder", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                        Grid.Rows.RemoveAt(Player.Index);
+                        Grid.Rows.RemoveAt(playerRow.Index);
                         Grid.Refresh();
                         Grid.ClearSelection();
                     }
@@ -395,12 +398,9 @@ namespace LoLBalancing
 
         // Conducts the Balancing Algorithm and Saves once a roster is set
         private void button_Balance_Click(object sender, EventArgs e) {
-            if (dataGridView_Players.Rows.Count < 40) {
-                MessageBox.Show("Minimum amount of players is 40 to balance.", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
             Application.DoEvents();
             Cursor.Current = Cursors.WaitCursor;
+            richTextBox_Console.Clear();
             int parseRow = 0;
             // IGN -> Player Obj. IGN ALWAYS LOWERCASE
             Dictionary<string, Player> roster = new Dictionary<string, Player>();
@@ -416,6 +416,8 @@ namespace LoLBalancing
                     Role playerSec = (playerPri == Role.FILL) ?
                             Role.FILL : STRING_TO_ROLE[playerRow.Cells[6].Value.ToString()];
                     if (playerPri == playerSec && playerPri != Role.FILL) {
+                        string msg = playerName + ": Filled out same primary and secondary role.";
+                        write_ConsoleLog(msg, false);
                         playerSec = Role.FILL;
                     }
                     string playerDuo = playerRow.Cells[7].Value.ToString();
@@ -426,19 +428,20 @@ namespace LoLBalancing
 
             }
             catch (Exception ex) {
-                string message = "ERROR - Parsing Inputs: " + ex.Message + '\n' +
-                    "Check Row: " + parseRow;
-                write_ConsoleLog(message, true);
+                string msg = "ERROR - Parsing Inputs: " + ex.Message + ". Check Row: " + parseRow;
+                write_ConsoleLog(msg, true);
                 return;
             }
 
             // ----- Check number of Players
             if (roster.Count < MIN_PLAYERS) {
-                Console.WriteLine("ERROR - Total number of Players does not exceed 40");
+                string msg = "ERROR - Total number of Players needs to be 40.";
+                write_ConsoleLog(msg, true);
                 return;
             }
             if (roster.Count % NUM_ROLES != 0) {
-                Console.WriteLine("ERROR - Total number of Players is not divisible by 5");
+                string msg = "ERROR - Total number of Players is not divisible by 5.";
+                write_ConsoleLog(msg, true);
                 return;
             }
             int numTeams = roster.Count / NUM_ROLES;
@@ -459,20 +462,20 @@ namespace LoLBalancing
                     // 1) If Primary/Secondary are the same
                     Player origPlayer = roster[summoner];
                     Player duoPlayer = roster[duoIGNLower];
-                    if ((origPlayer.primaryRole == duoPlayer.secondRole &&
-                        origPlayer.secondRole == duoPlayer.primaryRole) ||
-                        (origPlayer.primaryRole == duoPlayer.primaryRole &&
-                        origPlayer.secondRole == duoPlayer.secondRole)) {
-                        origPlayer.primaryRole = Role.FILL;
+                    if ((origPlayer.primaryRole == duoPlayer.secondRole && origPlayer.secondRole == duoPlayer.primaryRole) &&
+                        (origPlayer.primaryRole != Role.FILL || duoPlayer.primaryRole != Role.FILL)) {
+                        string msg = summoner + " and " + duoIGNLower + 
+                            ": Both duos for primary and secondary were interchangeably the same.";
+                        write_ConsoleLog(msg, false);
                         origPlayer.secondRole = Role.FILL;
-                        duoPlayer.primaryRole = Role.FILL;
                         duoPlayer.secondRole = Role.FILL;
                     }
                     // 2) If both Primary is same
                     // Roll a number on who to bump Secondary to Primary, and make Secondary Fill
-                    if (origPlayer.primaryRole == duoPlayer.primaryRole &&
-                        origPlayer.secondRole == Role.FILL &&
-                        duoPlayer.secondRole == Role.FILL) {
+                    if (origPlayer.primaryRole == duoPlayer.primaryRole) {
+                        string msg = summoner + " and " + duoIGNLower +
+                            ": Both duos had the same primary role.";
+                        write_ConsoleLog(msg, false);
                         if (randomNumber(1, 2) == 1) {
                             origPlayer.primaryRole = origPlayer.secondRole;
                             origPlayer.secondRole = Role.FILL;
@@ -486,6 +489,10 @@ namespace LoLBalancing
                 catch {
                     // Player couldn't be found or incorrect, so we blank out duo
                     Player player = roster[summoner];
+                    if (!string.IsNullOrWhiteSpace(player.duo)) {
+                        string msg = summoner + ": Duo \"" + player.duo + "\" does not exist.";
+                        write_ConsoleLog(msg, false);
+                    }
                     player.duo = "";
                     // Can't modify duoList yet, so store the name
                     noDuoList.Add(summoner);
@@ -502,11 +509,11 @@ namespace LoLBalancing
             int lowestRange = (int)numeric_Threshold.Value + 1;
             int randSeed = (int)numeric_StartSeed.Value, currChecks = 0;
             Balance bestBalance = new Balance(); // This will store our bestBalance
-            while (lowestRange > (int)numeric_Threshold.Value && 
+            // Begin megaloop
+            while (lowestRange != (int)numeric_Threshold.Value && 
                 currChecks < (int)numeric_MaxChecks.Value) {
-                // Preparations: Make a copy of roster that can be edited
+                // Preparations: Make a deep copy of roster that can be edited
                 Dictionary<string, Player> masterList = deepClone(roster);
-                randSeed++;
 
                 // Begin
                 Dictionary<Role, List<Player>> assignRoleList = new Dictionary<Role, List<Player>>() {
@@ -522,8 +529,9 @@ namespace LoLBalancing
                         numTeams, randSeed, true);
                 }
                 catch (Exception ex) {
-                    Console.WriteLine("ERROR - Assigning primary roles\n" +
-                        "Reason: " + ex.Message);
+                    string msg = "ERROR - Assigning primary roles. " +
+                        "Reason: " + ex.Message;
+                    write_ConsoleLog(msg, true);
                     return;
                 }
                 // Assign non-Fill Secondary Roles
@@ -532,8 +540,9 @@ namespace LoLBalancing
                         numTeams, randSeed, false);
                 }
                 catch (Exception ex) {
-                    Console.WriteLine("ERROR - Assigning secondary roles\n" +
-                        "Reason: " + ex.Message);
+                    string msg = "ERROR - Assigning secondary roles. " +
+                        "Reason: " + ex.Message;
+                    write_ConsoleLog(msg, true);
                     return;
                 }
                 // the remaining masterList is now fillList
@@ -548,21 +557,21 @@ namespace LoLBalancing
                 // Validation: Should hopefully never occur
                 foreach (List<Player> roleList in assignRoleList.Values) {
                     if (roleList.Count != numTeams) {
-                        Console.WriteLine("ERROR - assignRoleList does not have numTeams");
+                        string msg = "ERROR - assignRoleList does not have numTeams";
+                        write_ConsoleLog(msg, true);
                         return;
                     }
                 }
 
                 // ---- PART 3: BALANCING
-                // Initialize the Teams
+                // Initialize the Balance abstract
                 Balance currBalance = new Balance(assignRoleList, out lowestRange);
+                // All queues acting as a clock queue
                 int currMaxIndex = currBalance.getMaxTeamIndex();
                 int currMinIndex = currBalance.getMinTeamIndex();
                 int rolesRemain = NUM_ROLES;
-                // All queues acting as a clock queue
-                Queue<Role> roleQ = new Queue<Role>();
-                roleQ.Enqueue(Role.TOP); roleQ.Enqueue(Role.JNG); roleQ.Enqueue(Role.MID);
-                roleQ.Enqueue(Role.BOT); roleQ.Enqueue(Role.SUP);
+                Queue<Role> roleQ = new Queue<Role>(new Role[] {
+                    Role.TOP, Role.JNG, Role.MID, Role.BOT, Role.SUP });
                 Queue<int> maxIndexQ = new Queue<int>();
                 Queue<int> minIndexQ = new Queue<int>();
                 for (int i = 0; i < numTeams; ++i) {
@@ -595,7 +604,6 @@ namespace LoLBalancing
                             currMinIndex = currBalance.getMinTeamIndex();
                             currMaxIndex = currBalance.getMaxTeamIndex();
                             lowestRange = newRange;
-                            Console.WriteLine(lowestRange);
                             minCheckRemain = numTeams;
                             maxCheckRemain = numTeams;
                             rolesRemain = NUM_ROLES;
@@ -630,7 +638,12 @@ namespace LoLBalancing
                     roleQ.Dequeue();
                     roleQ.Enqueue(checkRole);
                 }
-                currChecks++;
+                // An entire "seedCheck" is finished here
+                if (checkBox_WriteRange.Checked) {
+                    string msg = "Lowest range in Seed " + randSeed + ": " + lowestRange;
+                    write_ConsoleLog(msg, false);
+                }
+                currChecks++; randSeed++;
             }
             Cursor.Current = Cursors.Default;
             // ---- PART 4: OUTPUT BEST
@@ -647,13 +660,13 @@ namespace LoLBalancing
             return;
         }
 
-        // Write in Console log when there's an error.
+        // Write in Console log. Error is true if it forces an exit.
         private void write_ConsoleLog(string msg, bool error) {
             if (error) {
                 MessageBox.Show("An error occurred when trying to balance. Please look at the Console Log.",
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            richTextBox_Console.Text = msg;
+            richTextBox_Console.Text += msg + '\n';
         }
 
         // Once Teams are completely balanced, output and save them into an Excel sheet.
@@ -883,6 +896,7 @@ namespace LoLBalancing
             return retRole;
         }
 
+        // Checks if the name is in the playerList
         private bool containsName(List<Player> roleList, string name) {
             foreach (Player player in roleList) {
                 if (player.ign.ToLower() == name.ToLower()) {
