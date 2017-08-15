@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LoLBalanceV2
+namespace LoLBalancing
 {
     [Serializable]
     public class Player : IComparable<Player>
@@ -30,7 +30,7 @@ namespace LoLBalanceV2
                 primaryRole != assignedRole &&
                 secondRole != assignedRole;
         }
-        
+
         // Default Ctor
         public Player() {
             tier = Tier.BRONZE;
@@ -100,7 +100,7 @@ namespace LoLBalanceV2
 }
 
 // Enumerations signifying Tiers
-namespace LoLBalanceV2
+namespace LoLBalancing
 {
     public enum Tier
     {
@@ -111,11 +111,8 @@ namespace LoLBalanceV2
         DIAMOND,
         MASTER
     }
-}
 
-// Enumerations signifying everyone's roles
-namespace LoLBalanceV2
-{
+    // Enumerations signifying everyone's roles
     public enum Role
     {
         TOP,

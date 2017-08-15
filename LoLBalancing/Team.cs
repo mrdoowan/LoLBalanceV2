@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LoLBalanceV2
+namespace LoLBalancing
 {
     [Serializable]
     class Team
@@ -58,7 +58,7 @@ namespace LoLBalanceV2
             }
             return false;
         }
-        
+
         // Returns a solo player with preference of primary and secondary
         // in the team
         public Player aSoloPlayerFromTeam(Role primary, Role second) {

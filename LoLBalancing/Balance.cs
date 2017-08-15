@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 
-namespace LoLBalanceV2
+namespace LoLBalancing
 {
     [Serializable]
     class Balance
@@ -76,7 +76,7 @@ namespace LoLBalanceV2
         }
 
         // Helper recursive function for the above in conjunction with duos
-        private void duoChainHelper(string ogPlayerName, Player passedPlayer, 
+        private void duoChainHelper(string ogPlayerName, Player passedPlayer,
             int ogTeam, int swapTeam, ref HashSet<Role> roleList, bool firstFlag = true) {
             // The below condition is to make sure we do not hit an infinite loop
             if (ogPlayerName == passedPlayer.ign && !firstFlag) { return; }
@@ -126,7 +126,7 @@ namespace LoLBalanceV2
                         Player soloPlayer = teams[i].aSoloPlayerFromTeam(duoPlayer.primaryRole, duoPlayer.secondRole);
                         for (int j = 0; j < teams.Count; ++j) {
                             Player possDuo = teams[j].getPlayerRole(ogRole);
-                            if (possDuo.ign.ToLower()  == duoName.ToLower()) {
+                            if (possDuo.ign.ToLower() == duoName.ToLower()) {
                                 teams[i].setPlayerRole(soloPlayer.assignedRole, possDuo);
                                 teams[j].setPlayerRole(ogRole, soloPlayer);
                                 break;
