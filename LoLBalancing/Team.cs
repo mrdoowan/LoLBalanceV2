@@ -62,8 +62,9 @@ namespace LoLBalancing
         // Returns a solo player with preference of primary and secondary
         // in the team
         public Player aSoloPlayerFromTeam(Role primary, Role second) {
-            if (!players[primary].hasDuo()) { return players[primary]; }
-            if (!players[second].hasDuo()) { return players[second]; }
+            try { if (!players[primary].hasDuo()) { return players[primary]; } } catch { }
+            try { if (!players[second].hasDuo()) { return players[second]; } } catch { }
+            // The try+catch is for any Fill roles
             List<Player> soloPlayers = new List<Player>();
             foreach (Player player in players.Values) {
                 if (!player.hasDuo()) {

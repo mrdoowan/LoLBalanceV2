@@ -20,15 +20,21 @@ namespace LoLBalancing
             return primaryRole == assignedRole;
         }
         public bool isSecondaryAssigned() {
-            return secondRole == assignedRole ||
-                (primaryRole != assignedRole &&
-                secondRole == Role.FILL);
+            return secondRole == assignedRole;
+        }
+        public bool isRoleFilled() {
+            return (primaryRole == Role.FILL) ||
+                (primaryRole != assignedRole && secondRole == Role.FILL);
         }
         public bool isAutoFilled() {
             return primaryRole != Role.FILL &&
                 secondRole != Role.FILL &&
                 primaryRole != assignedRole &&
                 secondRole != assignedRole;
+        }
+        // so that string.IsNullorWhite fxn isn't overkilled
+        public bool hasDuo() {
+            return (!string.IsNullOrWhiteSpace(duo));
         }
 
         // Default Ctor
@@ -60,7 +66,7 @@ namespace LoLBalancing
             int pts = TIER_TO_PTS[this.tier] * 5 + (6 - this.division);
             if (roleAffect) {
                 // Any players filled or get their secondary role will be 10% lower
-                if (primaryRole == Role.FILL || isSecondaryAssigned()) {
+                if (isRoleFilled() || isSecondaryAssigned()) {
                     pts = pts * 9 / 10;
                 }
                 // Players that are autofilled will be 30% lower
@@ -69,11 +75,6 @@ namespace LoLBalancing
                 }
             }
             return (pts < 1) ? 1 : pts;
-        }
-
-        // so that string.IsNullorWhite fxn isn't overkilled
-        public bool hasDuo() {
-            return (!string.IsNullOrWhiteSpace(duo));
         }
 
         // -1 if this rank is lower than Other rank

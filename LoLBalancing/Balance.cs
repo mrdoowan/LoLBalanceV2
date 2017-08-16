@@ -116,15 +116,17 @@ namespace LoLBalancing
                 Player ogPlayer = teams[i].getPlayerRole(ogRole);
                 string duoName = ogPlayer.duo;
                 if (ogPlayer.hasDuo()) {
-                    Player duoPlayer = roster[duoName.ToLower()];
-                    Role duoRole = duoPlayer.assignedRole;
+                    // Player duoPlayer = roster[duoName.ToLower()];
+                    Role duoRole = roster[duoName.ToLower()].assignedRole;
                     // j == duoTeam #
-                    // CORNER CASE 1: If the player and the duo has the same Role
+                    /* // CORNER CASE 1: If the player and the duo has the same Role
                     if (ogRole == duoRole) {
                         // This only happens if the duo was suddenly autoFilled into the same role as his partner
                         // Just grab a solo from the ogTeam and force swap with duoTeam
                         Player soloPlayer = teams[i].aSoloPlayerFromTeam(duoPlayer.primaryRole, duoPlayer.secondRole);
+                        // Find the soloPlayer in other teams
                         for (int j = 0; j < teams.Count; ++j) {
+                            if (i == j) { continue; }
                             Player possDuo = teams[j].getPlayerRole(ogRole);
                             if (possDuo.ign.ToLower() == duoName.ToLower()) {
                                 teams[i].setPlayerRole(soloPlayer.assignedRole, possDuo);
@@ -132,7 +134,7 @@ namespace LoLBalancing
                                 break;
                             }
                         }
-                    }
+                    } */
                     // CONDITION 2: Both player and the duo have different roles
                     for (int j = 0; j < teams.Count; ++j) {
                         if (teams[j].getPlayerRole(duoRole).ign.ToLower() == duoName.ToLower()) {

@@ -421,6 +421,11 @@ namespace LoLBalancing
                         playerSec = Role.FILL;
                     }
                     string playerDuo = playerRow.Cells[7].Value.ToString();
+                    if (playerDuo.ToLower() == playerName.ToLower()) {
+                        string msg = playerName + ": Wrote themselves as their duo.";
+                        write_ConsoleLog(msg, false);
+                        playerDuo = "";
+                    }
                     duoList.Add(playerIGN.ToLower(), playerDuo.ToLower());
                     roster.Add(playerIGN.ToLower(), new Player(playerName, playerIGN,
                         playerTier, playerDiv, playerPri, playerSec, playerDuo));
@@ -545,7 +550,7 @@ namespace LoLBalancing
                     write_ConsoleLog(msg, true);
                     return;
                 }
-                // the remaining masterList is now fillList
+                // the remaining masterList is now fillList.
                 while (masterList.Count > 0) {
                     // Find role with smallest points, and add highest Ranked player
                     Role addFillRole = roleMinPointsFill(assignRoleList, numTeams);
@@ -553,6 +558,19 @@ namespace LoLBalancing
                     addPlayer.assignedRole = addFillRole;
                     assignRoleList[addFillRole].Add(addPlayer);
                     masterList.Remove(addPlayer.ign.ToLower());
+                    // Make sure the player does not have the same role as their duo
+                    // If so, randomly switch a solo player who is autoFill -> secondary -> Primary 
+                    // from another role
+                    if (containsName(assignRoleList[addFillRole], addPlayer.duo)) {
+                        Player swapPlayer = aSoloFromRole(assignRoleList, addFillRole);
+                        Role swapRole = swapPlayer.assignedRole;
+                        assignRoleList[swapRole].Remove(swapPlayer);
+                        assignRoleList[addFillRole].Remove(addPlayer);
+                        swapPlayer.assignedRole = addFillRole;
+                        assignRoleList[addFillRole].Add(swapPlayer);
+                        addPlayer.assignedRole = swapRole;
+                        assignRoleList[swapRole].Add(addPlayer);
+                    }
                 }
                 // Validation: Should hopefully never occur
                 foreach (List<Player> roleList in assignRoleList.Values) {
@@ -896,10 +914,35 @@ namespace LoLBalancing
             return retRole;
         }
 
+        // Returns a random autoFill -> Secondary -> Primary player from that role
+        private Player aSoloFromRole(Dictionary<Role, List<Player>> assignRoleList, 
+            Role ignoreRole) {
+            List<Player> playerPool = new List<Player>();
+            // AutoFill == 0, Secondary == 1, Primary == 2
+            for (int i = 0; i < 2; ++i) {
+                foreach (Role role in assignRoleList.Keys) {
+                    if (role == ignoreRole) { continue; }
+                    List<Player> roleList = assignRoleList[role];
+                    foreach (Player player in roleList) {
+                        if ((i == 0 && (player.isAutoFilled() || player.isRoleFilled())) ||
+                            (i == 1 && player.isSecondaryAssigned()) ||
+                            (i == 2 && player.isPrimaryAssigned()) &&
+                            !player.hasDuo()) {
+                            playerPool.Add(player);
+                        }
+                    }
+                }
+                if (playerPool.Count > 0) {
+                    return playerPool[randomNumber(0, playerPool.Count - 1)];
+                }
+            }
+            return new Player(); // should never get here
+        }
+
         // Checks if the name is in the playerList
-        private bool containsName(List<Player> roleList, string name) {
+        private bool containsName(List<Player> roleList, string ign) {
             foreach (Player player in roleList) {
-                if (player.ign.ToLower() == name.ToLower()) {
+                if (player.ign.ToLower() == ign.ToLower()) {
                     return true;
                 }
             }
