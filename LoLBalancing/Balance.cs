@@ -7,7 +7,7 @@ namespace LoLBalancing
     class Balance
     {
         public List<Team> teams;
-        private Dictionary<string, Player> roster;    // Complete roster loaded here
+        private Dictionary<Name, Player> roster;    // Complete roster loaded here
         private int rangeBalance;       // This is the difference between max and min of teamValues
         private int maxTeamIndex;
         private int minTeamIndex;
@@ -15,7 +15,7 @@ namespace LoLBalancing
         // Default ctor
         public Balance() {
             teams = new List<Team>();
-            roster = new Dictionary<string, Player>();
+            roster = new Dictionary<Name, Player>();
             rangeBalance = 0;
             maxTeamIndex = 0;
             minTeamIndex = 0;
@@ -25,7 +25,7 @@ namespace LoLBalancing
         public Balance(Dictionary<Role, List<Player>> roleList, out int range) {
             // Fxn start
             teams = new List<Team>();
-            roster = new Dictionary<string, Player>();
+            roster = new Dictionary<Name, Player>();
             int numTeams = roleList[Role.TOP].Count;
             // Also check if Duos are in the same Role
             for (int i = 0; i < numTeams; ++i) {
@@ -35,11 +35,11 @@ namespace LoLBalancing
                 Player adc = roleList[Role.BOT][i];
                 Player sup = roleList[Role.SUP][i];
                 teams.Add(new Team(top, jng, mid, adc, sup));
-                roster.Add(top.ign.ToLower(), top);
-                roster.Add(jng.ign.ToLower(), jng);
-                roster.Add(mid.ign.ToLower(), mid);
-                roster.Add(adc.ign.ToLower(), adc);
-                roster.Add(sup.ign.ToLower(), sup);
+                roster.Add(top.ign, top);
+                roster.Add(jng.ign, jng);
+                roster.Add(mid.ign, mid);
+                roster.Add(adc.ign, adc);
+                roster.Add(sup.ign, sup);
             }
             // Align duos into the same teams. i == Team #
             alignDuoRole(Role.TOP);
@@ -76,17 +76,17 @@ namespace LoLBalancing
         }
 
         // Helper recursive function for the above in conjunction with duos
-        private void duoChainHelper(string ogPlayerName, Player passedPlayer,
-            int ogTeam, int swapTeam, ref HashSet<Role> roleList, bool firstFlag = true) {
+        private void duoChainHelper(Name firstPlayerName, Player passedPlayer,
+            int passedTeam, int swapTeam, ref HashSet<Role> roleList, bool firstFlag = true) {
             // The below condition is to make sure we do not hit an infinite loop
-            if (ogPlayerName == passedPlayer.ign && !firstFlag) { return; }
-            if (passedPlayer.hasDuo()) {
-                string duoPlayer1name = passedPlayer.duo;
-                Player duoPlayer1 = roster[duoPlayer1name.ToLower()];
+            if (firstPlayerName == passedPlayer.ign && !firstFlag) { return; }
+            if (teams[passedTeam].isDuoInTeam(passedPlayer)) {
+                Name duoPlayer1name = passedPlayer.duo;
+                Player duoPlayer1 = roster[duoPlayer1name];
                 Role duoRole = duoPlayer1.assignedRole;
                 roleList.Add(duoRole);
                 Player swapPlayer = teams[swapTeam].getPlayerRole(duoRole);
-                duoChainHelper(ogPlayerName, swapPlayer, swapTeam, ogTeam, ref roleList, false);
+                duoChainHelper(firstPlayerName, swapPlayer, swapTeam, passedTeam, ref roleList, false);
             }
         }
 
@@ -114,10 +114,10 @@ namespace LoLBalancing
             // i == ogTeam #
             for (int i = 0; i < teams.Count; ++i) {
                 Player ogPlayer = teams[i].getPlayerRole(ogRole);
-                string duoName = ogPlayer.duo;
+                Name duoName = ogPlayer.duo;
                 if (ogPlayer.hasDuo()) {
-                    // Player duoPlayer = roster[duoName.ToLower()];
-                    Role duoRole = roster[duoName.ToLower()].assignedRole;
+                    // Player duoPlayer = roster[duoName];
+                    Role duoRole = roster[duoName].assignedRole;
                     // j == duoTeam #
                     /* // CORNER CASE 1: If the player and the duo has the same Role
                     if (ogRole == duoRole) {
@@ -128,7 +128,7 @@ namespace LoLBalancing
                         for (int j = 0; j < teams.Count; ++j) {
                             if (i == j) { continue; }
                             Player possDuo = teams[j].getPlayerRole(ogRole);
-                            if (possDuo.ign.ToLower() == duoName.ToLower()) {
+                            if (possDuo.ign == duoName) {
                                 teams[i].setPlayerRole(soloPlayer.assignedRole, possDuo);
                                 teams[j].setPlayerRole(ogRole, soloPlayer);
                                 break;
@@ -137,12 +137,12 @@ namespace LoLBalancing
                     } */
                     // CONDITION 2: Both player and the duo have different roles
                     for (int j = 0; j < teams.Count; ++j) {
-                        if (teams[j].getPlayerRole(duoRole).ign.ToLower() == duoName.ToLower()) {
+                        if (teams[j].getPlayerRole(duoRole).ign == duoName) {
                             // Now need to check if teams[i].Player(duoRole) has a duo
                             // AND if that duo is in teams[i] (save that person's role)
                             Player swapPlayer = teams[i].getPlayerRole(duoRole);
                             if (swapPlayer.hasDuo()) {
-                                Player swapPlayerDuo = roster[swapPlayer.duo.ToLower()];
+                                Player swapPlayerDuo = roster[swapPlayer.duo];
                                 if (teams[i].isNameInTeam(swapPlayerDuo.ign)) {
                                     // If this condition is true, find two solos within those roles
                                     // Swap those two with ogTeam. 

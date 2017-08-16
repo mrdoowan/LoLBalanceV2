@@ -50,15 +50,25 @@ namespace LoLBalancing
         }
 
         // Returns true if ign is in the Team
-        public bool isNameInTeam(string ign) {
+        public bool isNameInTeam(Name ign) {
             foreach (Player player in players.Values) {
-                if (player.ign.ToLower() == ign.ToLower()) {
+                if (player.ign == ign) {
                     return true;
                 }
             }
             return false;
         }
 
+        // Returns true if the player's duo is currently in the team
+        public bool isDuoInTeam(Player player) {
+            if (!player.hasDuo()) { return false; }
+            foreach (Player possDuo in players.Values) {
+                if (possDuo.ign == player.duo) { return true; }
+            }
+            return false;
+        }
+
+        /*
         // Returns a solo player with preference of primary and secondary
         // in the team
         public Player aSoloPlayerFromTeam(Role primary, Role second) {
@@ -89,5 +99,6 @@ namespace LoLBalancing
             }
             return solo;
         }
+        */
     }
 }

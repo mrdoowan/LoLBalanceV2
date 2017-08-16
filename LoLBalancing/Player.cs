@@ -7,13 +7,13 @@ namespace LoLBalancing
     public class Player : IComparable<Player>
     {
         public string name;         // Real name of player (never use this for code)  
-        public string ign;          // Summoner name
+        public Name ign;            // Summoner name
         public Tier tier;
         public int division;
         public Role primaryRole;    // Primary Role
         public Role secondRole;     // Secondary Role
         public Role assignedRole;   // The assigned Role when in a team. Initialize to NONE
-        public string duo;          // Leave blank if Solo
+        public Name duo;            // Leave blank if Solo
 
         // Return boolean getters
         public bool isPrimaryAssigned() {
@@ -34,7 +34,7 @@ namespace LoLBalancing
         }
         // so that string.IsNullorWhite fxn isn't overkilled
         public bool hasDuo() {
-            return (!string.IsNullOrWhiteSpace(duo));
+            return (!string.IsNullOrWhiteSpace(duo.name));
         }
 
         // Default Ctor
@@ -47,8 +47,8 @@ namespace LoLBalancing
         }
 
         // Init ctor
-        public Player(string name_, string ign_, Tier tier_, int div_,
-            Role pri_, Role sec_, string duo_ = "") {
+        public Player(string name_, Name ign_, Tier tier_, int div_,
+            Role pri_, Role sec_, Name duo_) {
             name = name_;
             ign = ign_;
             tier = tier_;

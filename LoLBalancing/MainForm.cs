@@ -25,7 +25,7 @@ namespace LoLBalancing
 
         // Variables for upgrading
         //static private bool upgrading = false;
-        private const string VERSION = "2.0";
+        private const string VERSION = "2.1";
 
         // Color Codes for Ranks
         public const string UNRANKHEX = "#B4A7D6";
@@ -402,14 +402,14 @@ namespace LoLBalancing
             Cursor.Current = Cursors.WaitCursor;
             richTextBox_Console.Clear();
             int parseRow = 0;
-            // IGN -> Player Obj. IGN ALWAYS LOWERCASE
-            Dictionary<string, Player> roster = new Dictionary<string, Player>();
-            // IGN -> duoIGN. ALWAYS IN LOWERCASE
-            Dictionary<string, string> duoList = new Dictionary<string, string>();
+            // IGN -> Player Obj.
+            Dictionary<Name, Player> roster = new Dictionary<Name, Player>();
+            // IGN -> duoIGN.
+            Dictionary<Name, Name> duoList = new Dictionary<Name, Name>();
             try {
                 foreach (DataGridViewRow playerRow in dataGridView_Players.Rows) {
                     string playerName = playerRow.Cells[1].Value.ToString();
-                    string playerIGN = playerRow.Cells[2].Value.ToString();
+                    Name playerIGN = new Name(playerRow.Cells[2].Value.ToString());
                     Tier playerTier = STRING_TO_TIER[playerRow.Cells[3].Value.ToString()];
                     int playerDiv = int.Parse(playerRow.Cells[4].Value.ToString());
                     Role playerPri = STRING_TO_ROLE[playerRow.Cells[5].Value.ToString()];
@@ -420,14 +420,14 @@ namespace LoLBalancing
                         write_ConsoleLog(msg, false);
                         playerSec = Role.FILL;
                     }
-                    string playerDuo = playerRow.Cells[7].Value.ToString();
-                    if (playerDuo.ToLower() == playerName.ToLower()) {
-                        string msg = playerName + ": Wrote themselves as their duo.";
+                    Name playerDuo = new Name(playerRow.Cells[7].Value.ToString());
+                    if (playerDuo == playerIGN) {
+                        string msg = playerIGN + ": Wrote themselves as their duo.";
                         write_ConsoleLog(msg, false);
-                        playerDuo = "";
+                        playerDuo.name = "";
                     }
-                    duoList.Add(playerIGN.ToLower(), playerDuo.ToLower());
-                    roster.Add(playerIGN.ToLower(), new Player(playerName, playerIGN,
+                    duoList.Add(playerIGN, playerDuo);
+                    roster.Add(playerIGN, new Player(playerName, playerIGN,
                         playerTier, playerDiv, playerPri, playerSec, playerDuo));
                 }
 
@@ -451,12 +451,12 @@ namespace LoLBalancing
             }
             int numTeams = roster.Count / NUM_ROLES;
             // ----- Validate duos and their Roles
-            List<string> noDuoList = new List<string>();
-            foreach (string summoner in duoList.Keys) {
+            List<Name> noDuoList = new List<Name>();
+            foreach (Name summoner in duoList.Keys) {
                 try {
-                    string duoIGNLower = duoList[summoner.ToLower()];
-                    string origIGNLower = duoList[duoIGNLower];
-                    if (summoner.ToLower() != origIGNLower) {
+                    Name duoIGN = duoList[summoner];
+                    Name ogIGN = duoList[duoIGN];
+                    if (summoner != ogIGN) {
                         throw new Exception();
                         // Pretty much being treated as not finding a Key
                         // It's bad practice, but suitable
@@ -466,10 +466,10 @@ namespace LoLBalancing
                     // If not, Fill for both primary and secondary
                     // 1) If Primary/Secondary are the same
                     Player origPlayer = roster[summoner];
-                    Player duoPlayer = roster[duoIGNLower];
+                    Player duoPlayer = roster[duoIGN];
                     if ((origPlayer.primaryRole == duoPlayer.secondRole && origPlayer.secondRole == duoPlayer.primaryRole) &&
                         (origPlayer.primaryRole != Role.FILL || duoPlayer.primaryRole != Role.FILL)) {
-                        string msg = summoner + " and " + duoIGNLower + 
+                        string msg = summoner + " and " + duoIGN + 
                             ": Both duos for primary and secondary were interchangeably the same.";
                         write_ConsoleLog(msg, false);
                         origPlayer.secondRole = Role.FILL;
@@ -478,10 +478,10 @@ namespace LoLBalancing
                     // 2) If both Primary is same
                     // Roll a number on who to bump Secondary to Primary, and make Secondary Fill
                     if (origPlayer.primaryRole == duoPlayer.primaryRole) {
-                        string msg = summoner + " and " + duoIGNLower +
+                        string msg = summoner + " and " + duoIGN +
                             ": Both duos had the same primary role.";
                         write_ConsoleLog(msg, false);
-                        if (randomNumber(1, 2) == 1) {
+                        if (randomNumber(1, 2, 0, false) == 1) {
                             origPlayer.primaryRole = origPlayer.secondRole;
                             origPlayer.secondRole = Role.FILL;
                         }
@@ -494,40 +494,50 @@ namespace LoLBalancing
                 catch {
                     // Player couldn't be found or incorrect, so we blank out duo
                     Player player = roster[summoner];
-                    if (!string.IsNullOrWhiteSpace(player.duo)) {
+                    if (!string.IsNullOrWhiteSpace(player.duo.name)) {
                         string msg = summoner + ": Duo \"" + player.duo + "\" does not exist.";
                         write_ConsoleLog(msg, false);
                     }
-                    player.duo = "";
+                    player.duo.name = "";
                     // Can't modify duoList yet, so store the name
                     noDuoList.Add(summoner);
                 }
             }
             // Blank out duoList
-            foreach (string summoner in noDuoList) {
-                duoList[summoner] = "";
+            foreach (Name summoner in noDuoList) {
+                duoList[summoner].name = "";
             }
-            // Store lowest ranked player
-            Player lowestPlayer = roster.Values.ToList().Min();
+            // Final count on how many duos
+            int numDuos = 0;
+            foreach (Name duo in duoList.Values) {
+                if (!string.IsNullOrWhiteSpace(duo.name)) { numDuos++; }
+            }
+            // At maximum, only 60% of the roster should be Duos
+            int maxDuos = roster.Count * 6 / 10;
+            if (numDuos > maxDuos) {
+                string msg = "There are " + numDuos + " valid duos, which is over 60% of the Roster (" + maxDuos + ")";
+                write_ConsoleLog(msg, true);
+                return;
+            }
 
             // ----- PART 2: ASSIGN ROLES
             int lowestRange = (int)numeric_Threshold.Value + 1;
-            int randSeed = (int)numeric_StartSeed.Value, currChecks = 0;
+            int randSeed = (int)numeric_StartSeed.Value - 1, currChecks = 0;
             Balance bestBalance = new Balance(); // This will store our bestBalance
             // Begin megaloop
             while (lowestRange != (int)numeric_Threshold.Value && 
                 currChecks < (int)numeric_MaxChecks.Value) {
+                currChecks++; randSeed++;
                 // Preparations: Make a deep copy of roster that can be edited
-                Dictionary<string, Player> masterList = deepClone(roster);
-
+                Dictionary<Name, Player> masterList = deepClone(roster);
                 // Begin
                 Dictionary<Role, List<Player>> assignRoleList = new Dictionary<Role, List<Player>>() {
-                        { Role.TOP, new List<Player>() },
-                        { Role.JNG, new List<Player>() },
-                        { Role.MID, new List<Player>() },
-                        { Role.BOT, new List<Player>() },
-                        { Role.SUP, new List<Player>() },
-                    };
+                    { Role.TOP, new List<Player>() },
+                    { Role.JNG, new List<Player>() },
+                    { Role.MID, new List<Player>() },
+                    { Role.BOT, new List<Player>() },
+                    { Role.SUP, new List<Player>() },
+                };
                 // Assign non-Fill Primary Roles
                 try {
                     assignRoles(ref masterList, ref assignRoleList, duoList,
@@ -552,17 +562,17 @@ namespace LoLBalancing
                 }
                 // the remaining masterList is now fillList.
                 while (masterList.Count > 0) {
-                    // Find role with smallest points, and add highest Ranked player
+                    // Find role with smallest points, and add a random player
                     Role addFillRole = roleMinPointsFill(assignRoleList, numTeams);
-                    Player addPlayer = masterList.Values.ToList().Max();
+                    Player addPlayer = masterList.Values.ToList().Max(); // Greedy approach
                     addPlayer.assignedRole = addFillRole;
                     assignRoleList[addFillRole].Add(addPlayer);
-                    masterList.Remove(addPlayer.ign.ToLower());
+                    masterList.Remove(addPlayer.ign);
                     // Make sure the player does not have the same role as their duo
                     // If so, randomly switch a solo player who is autoFill -> secondary -> Primary 
                     // from another role
                     if (containsName(assignRoleList[addFillRole], addPlayer.duo)) {
-                        Player swapPlayer = aSoloFromRole(assignRoleList, addFillRole);
+                        Player swapPlayer = aSoloFromRole(assignRoleList, addFillRole, randSeed);
                         Role swapRole = swapPlayer.assignedRole;
                         assignRoleList[swapRole].Remove(swapPlayer);
                         assignRoleList[addFillRole].Remove(addPlayer);
@@ -661,7 +671,6 @@ namespace LoLBalancing
                     string msg = "Lowest range in Seed " + randSeed + ": " + lowestRange;
                     write_ConsoleLog(msg, false);
                 }
-                currChecks++; randSeed++;
             }
             Cursor.Current = Cursors.Default;
             // ---- PART 4: OUTPUT BEST
@@ -671,11 +680,22 @@ namespace LoLBalancing
                     ".\nWould you like to save it?",
                     "Finished", MessageBoxButtons.YesNo) == DialogResult.Yes) {
                 save_TeamsExcel(bestBalance);
+                // Output point values for each team in the consoleLog
+                write_ConsoleLog("Team Points Total", false);
+                for (int i = 0; i < numTeams; ++i) {
+                    string msg = "Team " + (i + 1) + ": " + bestBalance.teams[i].calcTeamValue();
+                    write_ConsoleLog(msg, false);
+                }
             }
             else if (lowestRange > (int)numeric_Threshold.Value) {
                 MessageBox.Show("Could not find a balance with that threshold.");
             }
-            return;
+        }
+
+        // To enable/disable start seed value
+        private void checkBox_TrueRandom_CheckedChanged(object sender, EventArgs e) {
+            if (checkBox_TrueRandom.Checked) { numeric_StartSeed.Enabled = false; }
+            else { numeric_StartSeed.Enabled = true; }
         }
 
         // Write in Console log. Error is true if it forces an exit.
@@ -749,7 +769,7 @@ namespace LoLBalancing
                         row++;
                         Player player = teamSel.getPlayerRole(role);
                         xlWorkSheet.Cells[row, 1] = player.name;
-                        string ignString = player.ign;
+                        string ignString = player.ign.name;
                         if (player.hasDuo()) { ignString += " (D)"; }
                         xlWorkSheet.Cells[row, 2] = ignString;
                         string roleString = role2String[player.assignedRole];
@@ -812,25 +832,21 @@ namespace LoLBalancing
         }
 
         // Rolls a uniform random number between min and max
-        private int randomNumber(int min, int max) {
-            Random rnd = new Random();
-            return rnd.Next(min, max);
-        }
-        private int randomNumber(int min, int max, int seedVal) {
-            Random rnd = new Random(seedVal);
+        private int randomNumber(int min, int max, int seedVal, bool notPseudo) {
+            Random rnd = (notPseudo) ? new Random() : new Random(seedVal);
             return rnd.Next(min, max);
         }
 
         // Assigning roles from masterList based on primary or secondary
-        private void assignRoles(ref Dictionary<string, Player> masterList,
+        private void assignRoles(ref Dictionary<Name, Player> masterList,
             ref Dictionary<Role, List<Player>> assignRoleList,
-            Dictionary<string, string> duoList,
+            Dictionary<Name, Name> duoList,
             int numTeams, int randSeed, bool primaryRole) {
             // Fxn start
-            List<string> removeList = new List<string>();
-            foreach (string ign in masterList.Keys) {
+            List<Name> removeList = new List<Name>();
+            foreach (Name ign in masterList.Keys) {
                 Player player = masterList[ign];
-                string duoName = duoList[ign];
+                Name duoName = duoList[ign];
                 Role role = (primaryRole) ? player.primaryRole : player.secondRole;
                 if (role != Role.FILL && !containsName(assignRoleList[role], duoName)) {
                     player.assignedRole = role;
@@ -840,8 +856,8 @@ namespace LoLBalancing
                     removeList.Add(ign);
                 }
             }
-            foreach (string removeKey in removeList) {
-                masterList.Remove(removeKey.ToLower());
+            foreach (Name removeKey in removeList) {
+                masterList.Remove(removeKey);
             }
             // From Autofill options, determine the option number
             int roleChangeOption = 0;
@@ -856,7 +872,7 @@ namespace LoLBalancing
                     Player changePlayer = roleChange(roleChangeOption, roleList, randSeed, primaryRole);
                     roleList.Remove(changePlayer);
                     changePlayer.assignedRole = Role.NONE;
-                    masterList.Add(changePlayer.ign.ToLower(), changePlayer);
+                    masterList.Add(changePlayer.ign, changePlayer);
                 }
             }
         }
@@ -879,8 +895,8 @@ namespace LoLBalancing
             if (option == 1) {
                 // Method 1: Remove by random
                 int index = (primary) ?
-                    randomNumber(0, roleList.Count - 1, randSeed) :
-                    randomNumber(0, roleSecList.Count - 1, randSeed);
+                    randomNumber(0, roleList.Count - 1, randSeed, checkBox_TrueRandom.Checked) :
+                    randomNumber(0, roleSecList.Count - 1, randSeed, checkBox_TrueRandom.Checked);
                 changePlayer = (primary) ? roleList[index] : roleSecList[index];
             }
             else if (option == 2) {
@@ -916,7 +932,7 @@ namespace LoLBalancing
 
         // Returns a random autoFill -> Secondary -> Primary player from that role
         private Player aSoloFromRole(Dictionary<Role, List<Player>> assignRoleList, 
-            Role ignoreRole) {
+            Role ignoreRole, int seedVal) {
             List<Player> playerPool = new List<Player>();
             // AutoFill == 0, Secondary == 1, Primary == 2
             for (int i = 0; i < 2; ++i) {
@@ -933,16 +949,17 @@ namespace LoLBalancing
                     }
                 }
                 if (playerPool.Count > 0) {
-                    return playerPool[randomNumber(0, playerPool.Count - 1)];
+                    return playerPool[randomNumber(0, playerPool.Count - 1, 
+                        seedVal, checkBox_TrueRandom.Checked)];
                 }
             }
             return new Player(); // should never get here
         }
 
         // Checks if the name is in the playerList
-        private bool containsName(List<Player> roleList, string ign) {
+        private bool containsName(List<Player> roleList, Name ign) {
             foreach (Player player in roleList) {
-                if (player.ign.ToLower() == ign.ToLower()) {
+                if (player.ign == ign) {
                     return true;
                 }
             }
