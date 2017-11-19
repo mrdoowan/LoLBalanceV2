@@ -38,6 +38,37 @@ namespace LoLBalancing
         public const string MASTERHEX = "#FFD966";
         public const string CHALLENGERHEX = "#FFD966";
 
+        // Default dictionary of rank -> pt value
+        private Dictionary<string, int> DEFAULT_PLAYER2VALUE = new Dictionary<string, int>() {
+            { "Bronze 5", 1 },
+            { "Bronze 4", 2 },
+            { "Bronze 3", 3 },
+            { "Bronze 2", 4 },
+            { "Bronze 1", 5 },
+            { "Silver 5", 6 },
+            { "Silver 4", 7 },
+            { "Silver 3", 8 },
+            { "Silver 2", 9 },
+            { "Silver 1", 10 },
+            { "Gold 5", 11 },
+            { "Gold 4", 12 },
+            { "Gold 3", 13 },
+            { "Gold 2", 14 },
+            { "Gold 1", 15 },
+            { "Platinum 5", 16 },
+            { "Platinum 4", 17 },
+            { "Platinum 3", 18 },
+            { "Platinum 2", 19 },
+            { "Platinum 1", 20 },
+            { "Diamond 5", 21 },
+            { "Diamond 4", 22 },
+            { "Diamond 3", 23 },
+            { "Diamond 2", 24 },
+            { "Diamond 1", 25 },
+            { "Masters", 26 },
+            { "Challenger", 26 }
+        };
+
         #endregion
 
         #region Helper Functions
@@ -122,10 +153,13 @@ namespace LoLBalancing
             // https://stackoverflow.com/questions/8691951/can-the-datagridview-header-automatically-resize-itself
             
             // Load Properties.Settings
+
+            // Load in player rankings
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
             // Save into Properties.Settings
+
             // Properties.Settings.Default.Save();
         }
 

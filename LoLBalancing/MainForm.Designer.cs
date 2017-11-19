@@ -27,8 +27,9 @@
 		private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -49,6 +50,11 @@
             this.secondary_Col = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.duo_Col = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.button_AddPlayer = new System.Windows.Forms.Button();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.button1 = new System.Windows.Forms.Button();
+            this.dgv_Diamond = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTextBoxColumn6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.label8 = new System.Windows.Forms.Label();
             this.richTextBox_Console = new System.Windows.Forms.RichTextBox();
@@ -74,6 +80,8 @@
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Players)).BeginInit();
+            this.tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgv_Diamond)).BeginInit();
             this.tabPage2.SuspendLayout();
             this.groupBox_Setting.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_Threshold)).BeginInit();
@@ -93,6 +101,7 @@
             // 
             // pictureBox2
             // 
+            this.pictureBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
             this.pictureBox2.Location = new System.Drawing.Point(549, 27);
             this.pictureBox2.Name = "pictureBox2";
@@ -103,6 +112,8 @@
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(118, 27);
             this.label1.Name = "label1";
@@ -113,7 +124,11 @@
             // 
             // tabControl1
             // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Location = new System.Drawing.Point(12, 150);
             this.tabControl1.Name = "tabControl1";
@@ -140,6 +155,8 @@
             // 
             // label3
             // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.ForeColor = System.Drawing.Color.OrangeRed;
             this.label3.Location = new System.Drawing.Point(6, 348);
             this.label3.Name = "label3";
@@ -160,6 +177,8 @@
             // 
             // label_Total
             // 
+            this.label_Total.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label_Total.ForeColor = System.Drawing.Color.Teal;
             this.label_Total.Location = new System.Drawing.Point(358, 6);
             this.label_Total.Name = "label_Total";
@@ -193,15 +212,18 @@
             this.dataGridView_Players.AllowUserToAddRows = false;
             this.dataGridView_Players.AllowUserToDeleteRows = false;
             this.dataGridView_Players.AllowUserToResizeRows = false;
+            this.dataGridView_Players.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView_Players.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView_Players.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView_Players.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView_Players.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView_Players.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.X_Col,
@@ -233,8 +255,8 @@
             // name_Col
             // 
             this.name_Col.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            this.name_Col.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            this.name_Col.DefaultCellStyle = dataGridViewCellStyle2;
             this.name_Col.HeaderText = "Name";
             this.name_Col.MinimumWidth = 120;
             this.name_Col.Name = "name_Col";
@@ -306,6 +328,70 @@
             this.button_AddPlayer.UseVisualStyleBackColor = true;
             this.button_AddPlayer.Click += new System.EventHandler(this.button_AddPlayer_Click);
             // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.button1);
+            this.tabPage3.Controls.Add(this.dgv_Diamond);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Size = new System.Drawing.Size(629, 373);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Ranking Values";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(187, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(178, 23);
+            this.button1.TabIndex = 7;
+            this.button1.Text = "Reset Rank -> Points Values";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // dgv_Diamond
+            // 
+            this.dgv_Diamond.AllowUserToAddRows = false;
+            this.dgv_Diamond.AllowUserToDeleteRows = false;
+            this.dgv_Diamond.AllowUserToResizeRows = false;
+            this.dgv_Diamond.BackgroundColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgv_Diamond.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            this.dgv_Diamond.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgv_Diamond.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn6,
+            this.dataGridViewTextBoxColumn7});
+            this.dgv_Diamond.Location = new System.Drawing.Point(3, 3);
+            this.dgv_Diamond.MultiSelect = false;
+            this.dgv_Diamond.Name = "dgv_Diamond";
+            this.dgv_Diamond.RowHeadersVisible = false;
+            this.dgv_Diamond.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgv_Diamond.Size = new System.Drawing.Size(178, 367);
+            this.dgv_Diamond.TabIndex = 2;
+            // 
+            // dataGridViewTextBoxColumn6
+            // 
+            this.dataGridViewTextBoxColumn6.HeaderText = "Ranking";
+            this.dataGridViewTextBoxColumn6.MinimumWidth = 125;
+            this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
+            this.dataGridViewTextBoxColumn6.ReadOnly = true;
+            this.dataGridViewTextBoxColumn6.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.dataGridViewTextBoxColumn6.Width = 125;
+            // 
+            // dataGridViewTextBoxColumn7
+            // 
+            this.dataGridViewTextBoxColumn7.HeaderText = "Points";
+            this.dataGridViewTextBoxColumn7.MinimumWidth = 50;
+            this.dataGridViewTextBoxColumn7.Name = "dataGridViewTextBoxColumn7";
+            this.dataGridViewTextBoxColumn7.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.dataGridViewTextBoxColumn7.Width = 50;
+            // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.label8);
@@ -322,8 +408,10 @@
             // 
             // label8
             // 
+            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(6, 196);
+            this.label8.Location = new System.Drawing.Point(6, 192);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(486, 22);
             this.label8.TabIndex = 20;
@@ -332,6 +420,9 @@
             // 
             // richTextBox_Console
             // 
+            this.richTextBox_Console.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBox_Console.BackColor = System.Drawing.SystemColors.ControlLight;
             this.richTextBox_Console.Location = new System.Drawing.Point(6, 221);
             this.richTextBox_Console.Name = "richTextBox_Console";
@@ -342,6 +433,7 @@
             // 
             // button_Balance
             // 
+            this.button_Balance.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.button_Balance.Location = new System.Drawing.Point(498, 192);
             this.button_Balance.Name = "button_Balance";
             this.button_Balance.Size = new System.Drawing.Size(125, 23);
@@ -352,6 +444,8 @@
             // 
             // groupBox_Setting
             // 
+            this.groupBox_Setting.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox_Setting.Controls.Add(this.checkBox_TrueRandom);
             this.groupBox_Setting.Controls.Add(this.checkBox_WriteRange);
             this.groupBox_Setting.Controls.Add(this.label7);
@@ -384,6 +478,7 @@
             // 
             // checkBox_WriteRange
             // 
+            this.checkBox_WriteRange.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBox_WriteRange.AutoSize = true;
             this.checkBox_WriteRange.Checked = true;
             this.checkBox_WriteRange.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -396,13 +491,15 @@
             // 
             // label7
             // 
+            this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label7.ForeColor = System.Drawing.Color.DodgerBlue;
             this.label7.Location = new System.Drawing.Point(6, 120);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(605, 57);
             this.label7.TabIndex = 19;
             this.label7.Text = "Minimum of 40 Players.\r\nSuggested threshold = floor(# of Players / 15). Lower num" +
-    "ber == Better results\r\nMaximum of Roster * 60% Duos";
+    "ber generally means better results\r\nMaximum of (#Players * 60%) Duos";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // label5
@@ -459,6 +556,7 @@
             // 
             // radioButton_Low
             // 
+            this.radioButton_Low.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.radioButton_Low.AutoSize = true;
             this.radioButton_Low.Location = new System.Drawing.Point(310, 63);
             this.radioButton_Low.Name = "radioButton_Low";
@@ -469,6 +567,7 @@
             // 
             // radioButton_High
             // 
+            this.radioButton_High.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.radioButton_High.AutoSize = true;
             this.radioButton_High.Location = new System.Drawing.Point(310, 40);
             this.radioButton_High.Name = "radioButton_High";
@@ -479,6 +578,7 @@
             // 
             // radioButton_Best
             // 
+            this.radioButton_Best.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.radioButton_Best.AutoSize = true;
             this.radioButton_Best.Checked = true;
             this.radioButton_Best.Location = new System.Drawing.Point(310, 17);
@@ -522,6 +622,7 @@
             // 
             // label_Version
             // 
+            this.label_Version.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label_Version.Location = new System.Drawing.Point(329, 548);
             this.label_Version.Name = "label_Version";
             this.label_Version.Size = new System.Drawing.Size(316, 23);
@@ -537,6 +638,7 @@
             // 
             // label_StatsMsg
             // 
+            this.label_StatsMsg.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label_StatsMsg.ForeColor = System.Drawing.Color.DarkGreen;
             this.label_StatsMsg.Location = new System.Drawing.Point(12, 548);
             this.label_StatsMsg.Name = "label_StatsMsg";
@@ -558,7 +660,6 @@
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.pictureBox1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximumSize = new System.Drawing.Size(677, 614);
             this.MinimumSize = new System.Drawing.Size(677, 614);
             this.Name = "MainForm";
             this.Text = "League of Legends Balancer";
@@ -569,6 +670,8 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Players)).EndInit();
+            this.tabPage3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgv_Diamond)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.groupBox_Setting.ResumeLayout(false);
             this.groupBox_Setting.PerformLayout();
@@ -621,6 +724,11 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.CheckBox checkBox_WriteRange;
         private System.Windows.Forms.CheckBox checkBox_TrueRandom;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.DataGridView dgv_Diamond;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
     }
 }
 
