@@ -22,5 +22,29 @@ namespace LoLBalancing.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string pointsList {
+            get {
+                return ((string)(this["pointsList"]));
+            }
+            set {
+                this["pointsList"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string balanceSettings {
+            get {
+                return ((string)(this["balanceSettings"]));
+            }
+            set {
+                this["balanceSettings"] = value;
+            }
+        }
     }
 }

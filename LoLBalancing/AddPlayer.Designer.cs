@@ -44,13 +44,13 @@
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.groupBox_SecondaryRoles = new System.Windows.Forms.GroupBox();
-            this.radioButton7 = new System.Windows.Forms.RadioButton();
-            this.radioButton8 = new System.Windows.Forms.RadioButton();
-            this.radioButton9 = new System.Windows.Forms.RadioButton();
-            this.radioButton10 = new System.Windows.Forms.RadioButton();
-            this.radioButton11 = new System.Windows.Forms.RadioButton();
-            this.radioButton12 = new System.Windows.Forms.RadioButton();
             this.numericUpDown_Div = new System.Windows.Forms.NumericUpDown();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.checkBox3 = new System.Windows.Forms.CheckBox();
+            this.checkBox4 = new System.Windows.Forms.CheckBox();
+            this.checkBox5 = new System.Windows.Forms.CheckBox();
+            this.checkBox6 = new System.Windows.Forms.CheckBox();
             this.groupBox_PrimaryRoles.SuspendLayout();
             this.groupBox_SecondaryRoles.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Div)).BeginInit();
@@ -90,13 +90,12 @@
             this.comboBox_Tier.FormattingEnabled = true;
             this.comboBox_Tier.IntegralHeight = false;
             this.comboBox_Tier.Items.AddRange(new object[] {
-            "Unranked",
             "Bronze",
             "Silver",
             "Gold",
             "Platinum",
             "Diamond",
-            "Master",
+            "Masters",
             "Challenger"});
             this.comboBox_Tier.Location = new System.Drawing.Point(115, 65);
             this.comboBox_Tier.Name = "comboBox_Tier";
@@ -231,80 +230,18 @@
             // 
             // groupBox_SecondaryRoles
             // 
-            this.groupBox_SecondaryRoles.Controls.Add(this.radioButton7);
-            this.groupBox_SecondaryRoles.Controls.Add(this.radioButton8);
-            this.groupBox_SecondaryRoles.Controls.Add(this.radioButton9);
-            this.groupBox_SecondaryRoles.Controls.Add(this.radioButton10);
-            this.groupBox_SecondaryRoles.Controls.Add(this.radioButton11);
-            this.groupBox_SecondaryRoles.Controls.Add(this.radioButton12);
+            this.groupBox_SecondaryRoles.Controls.Add(this.checkBox5);
+            this.groupBox_SecondaryRoles.Controls.Add(this.checkBox6);
+            this.groupBox_SecondaryRoles.Controls.Add(this.checkBox3);
+            this.groupBox_SecondaryRoles.Controls.Add(this.checkBox4);
+            this.groupBox_SecondaryRoles.Controls.Add(this.checkBox2);
+            this.groupBox_SecondaryRoles.Controls.Add(this.checkBox1);
             this.groupBox_SecondaryRoles.Location = new System.Drawing.Point(230, 94);
             this.groupBox_SecondaryRoles.Name = "groupBox_SecondaryRoles";
             this.groupBox_SecondaryRoles.Size = new System.Drawing.Size(110, 171);
             this.groupBox_SecondaryRoles.TabIndex = 21;
             this.groupBox_SecondaryRoles.TabStop = false;
             this.groupBox_SecondaryRoles.Text = "Secondary";
-            // 
-            // radioButton7
-            // 
-            this.radioButton7.AutoSize = true;
-            this.radioButton7.Location = new System.Drawing.Point(6, 145);
-            this.radioButton7.Name = "radioButton7";
-            this.radioButton7.Size = new System.Drawing.Size(41, 19);
-            this.radioButton7.TabIndex = 33;
-            this.radioButton7.Text = "Fill";
-            this.radioButton7.UseVisualStyleBackColor = true;
-            // 
-            // radioButton8
-            // 
-            this.radioButton8.AutoSize = true;
-            this.radioButton8.Location = new System.Drawing.Point(6, 120);
-            this.radioButton8.Name = "radioButton8";
-            this.radioButton8.Size = new System.Drawing.Size(68, 19);
-            this.radioButton8.TabIndex = 32;
-            this.radioButton8.Text = "Support";
-            this.radioButton8.UseVisualStyleBackColor = true;
-            // 
-            // radioButton9
-            // 
-            this.radioButton9.AutoSize = true;
-            this.radioButton9.Location = new System.Drawing.Point(6, 95);
-            this.radioButton9.Name = "radioButton9";
-            this.radioButton9.Size = new System.Drawing.Size(49, 19);
-            this.radioButton9.TabIndex = 31;
-            this.radioButton9.Text = "ADC";
-            this.radioButton9.UseVisualStyleBackColor = true;
-            // 
-            // radioButton10
-            // 
-            this.radioButton10.AutoSize = true;
-            this.radioButton10.Location = new System.Drawing.Point(6, 70);
-            this.radioButton10.Name = "radioButton10";
-            this.radioButton10.Size = new System.Drawing.Size(46, 19);
-            this.radioButton10.TabIndex = 30;
-            this.radioButton10.Text = "Mid";
-            this.radioButton10.UseVisualStyleBackColor = true;
-            // 
-            // radioButton11
-            // 
-            this.radioButton11.AutoSize = true;
-            this.radioButton11.Location = new System.Drawing.Point(6, 45);
-            this.radioButton11.Name = "radioButton11";
-            this.radioButton11.Size = new System.Drawing.Size(62, 19);
-            this.radioButton11.TabIndex = 29;
-            this.radioButton11.Text = "Jungle";
-            this.radioButton11.UseVisualStyleBackColor = true;
-            // 
-            // radioButton12
-            // 
-            this.radioButton12.AutoSize = true;
-            this.radioButton12.Checked = true;
-            this.radioButton12.Location = new System.Drawing.Point(6, 20);
-            this.radioButton12.Name = "radioButton12";
-            this.radioButton12.Size = new System.Drawing.Size(46, 19);
-            this.radioButton12.TabIndex = 28;
-            this.radioButton12.TabStop = true;
-            this.radioButton12.Text = "Top";
-            this.radioButton12.UseVisualStyleBackColor = true;
             // 
             // numericUpDown_Div
             // 
@@ -327,6 +264,68 @@
             0,
             0,
             0});
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Location = new System.Drawing.Point(6, 21);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(47, 19);
+            this.checkBox1.TabIndex = 23;
+            this.checkBox1.Text = "Top";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(6, 46);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(63, 19);
+            this.checkBox2.TabIndex = 24;
+            this.checkBox2.Text = "Jungle";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            // 
+            // checkBox3
+            // 
+            this.checkBox3.AutoSize = true;
+            this.checkBox3.Location = new System.Drawing.Point(6, 96);
+            this.checkBox3.Name = "checkBox3";
+            this.checkBox3.Size = new System.Drawing.Size(50, 19);
+            this.checkBox3.TabIndex = 26;
+            this.checkBox3.Text = "ADC";
+            this.checkBox3.UseVisualStyleBackColor = true;
+            // 
+            // checkBox4
+            // 
+            this.checkBox4.AutoSize = true;
+            this.checkBox4.Location = new System.Drawing.Point(6, 71);
+            this.checkBox4.Name = "checkBox4";
+            this.checkBox4.Size = new System.Drawing.Size(47, 19);
+            this.checkBox4.TabIndex = 25;
+            this.checkBox4.Text = "Mid";
+            this.checkBox4.UseVisualStyleBackColor = true;
+            // 
+            // checkBox5
+            // 
+            this.checkBox5.AutoSize = true;
+            this.checkBox5.Location = new System.Drawing.Point(6, 146);
+            this.checkBox5.Name = "checkBox5";
+            this.checkBox5.Size = new System.Drawing.Size(42, 19);
+            this.checkBox5.TabIndex = 28;
+            this.checkBox5.Text = "Fill";
+            this.checkBox5.UseVisualStyleBackColor = true;
+            // 
+            // checkBox6
+            // 
+            this.checkBox6.AutoSize = true;
+            this.checkBox6.Location = new System.Drawing.Point(6, 121);
+            this.checkBox6.Name = "checkBox6";
+            this.checkBox6.Size = new System.Drawing.Size(69, 19);
+            this.checkBox6.TabIndex = 27;
+            this.checkBox6.Text = "Support";
+            this.checkBox6.UseVisualStyleBackColor = true;
             // 
             // AddPlayer
             // 
@@ -381,12 +380,12 @@
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.GroupBox groupBox_SecondaryRoles;
-        private System.Windows.Forms.RadioButton radioButton7;
-        private System.Windows.Forms.RadioButton radioButton8;
-        private System.Windows.Forms.RadioButton radioButton9;
-        private System.Windows.Forms.RadioButton radioButton10;
-        private System.Windows.Forms.RadioButton radioButton11;
-        private System.Windows.Forms.RadioButton radioButton12;
         private System.Windows.Forms.NumericUpDown numericUpDown_Div;
+        private System.Windows.Forms.CheckBox checkBox5;
+        private System.Windows.Forms.CheckBox checkBox6;
+        private System.Windows.Forms.CheckBox checkBox3;
+        private System.Windows.Forms.CheckBox checkBox4;
+        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }

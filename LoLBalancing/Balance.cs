@@ -32,7 +32,7 @@ namespace LoLBalancing
                 Player top = roleList[Role.TOP][i];
                 Player jng = roleList[Role.JNG][i];
                 Player mid = roleList[Role.MID][i];
-                Player adc = roleList[Role.BOT][i];
+                Player adc = roleList[Role.ADC][i];
                 Player sup = roleList[Role.SUP][i];
                 teams.Add(new Team(top, jng, mid, adc, sup));
                 roster.Add(top.ign, top);
@@ -45,7 +45,7 @@ namespace LoLBalancing
             alignDuoRole(Role.TOP);
             alignDuoRole(Role.JNG);
             alignDuoRole(Role.MID);
-            alignDuoRole(Role.BOT);
+            alignDuoRole(Role.ADC);
             alignDuoRole(Role.SUP);
             calcRange();
             range = rangeBalance;

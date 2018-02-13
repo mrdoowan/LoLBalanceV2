@@ -22,7 +22,7 @@ namespace LoLBalancing
             players.Add(Role.TOP, top);
             players.Add(Role.JNG, jng);
             players.Add(Role.MID, mid);
-            players.Add(Role.BOT, bot);
+            players.Add(Role.ADC, bot);
             players.Add(Role.SUP, sup);
         }
 
@@ -30,7 +30,7 @@ namespace LoLBalancing
         public int calcTeamValue() {
             int combinedValue = 0;
             foreach (Player player in players.Values) {
-                combinedValue += player.rankValue(true);
+                combinedValue += player.rankValue();
             }
             teamValue = combinedValue;
             return combinedValue;

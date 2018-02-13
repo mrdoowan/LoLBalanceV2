@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -22,24 +23,39 @@ namespace LoLBalancing
         private const int MAX_PLAYERS_SCROLL = 12;
         private const int DEFAULT_LASTCOL_WIDTH = 148;
         private const int SCROLLBAR_WIDTH = 17;
+        private const int START_EXCEL_ROW = 2;
+        private const int TIER_ROW = 3;
 
         // Variables for upgrading
         //static private bool upgrading = false;
         private const string VERSION = "2.1";
 
+        // Ranking consts
+        public const string BRONZE = "Bronze";
+        public const string SILVER = "Silver";
+        public const string GOLD = "Gold";
+        public const string PLATINUM = "Platinum";
+        public const string DIAMOND = "Diamond";
+        public const string MASTER = "Master";
+        public const string CHALLENGER = "Challenger";
+        public readonly string[] TIER_LIST = 
+            { BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, MASTER, CHALLENGER };
+
         // Color Codes for Ranks
-        public const string UNRANKHEX = "#B4A7D6";
+        //public const string UNRANKHEX = "#B4A7D6";
         public const string BRONZEHEX = "#9B5105";
         public const string SILVERHEX = "#C0C0C0";
         public const string GOLDHEX = "#F6B26B";
         public const string PLATHEX = "#5CBFA1";
         public const string DIAMONDHEX = "#A4C2F4";
-        //public const string MASTERHEX = "#E5E5E5";
-        public const string MASTERHEX = "#FFD966";
+        public const string MASTERHEX = "#E5E5E5";
+        //public const string MASTERSHEX = "#FFD966";
         public const string CHALLENGERHEX = "#FFD966";
 
+        // Current iteration of rank2pts value for balancing
+        public static Dictionary<string, int> currRank2Pts = new Dictionary<string, int>();
         // Default dictionary of rank -> pt value
-        private Dictionary<string, int> DEFAULT_PLAYER2VALUE = new Dictionary<string, int>() {
+        public static Dictionary<string, int> DEFAULT_PLAYER2VALUE = new Dictionary<string, int>() {
             { "Bronze 5", 1 },
             { "Bronze 4", 2 },
             { "Bronze 3", 3 },
@@ -74,7 +90,7 @@ namespace LoLBalancing
         #region Helper Functions
 
         // For securing the Trash
-        private static void releaseObject(object obj) {
+        private void releaseObject(object obj) {
             try {
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
                 obj = null;
@@ -88,36 +104,28 @@ namespace LoLBalancing
             }
         }
 
-        // Check update for a new VERSION
-        private void Check_Update() {
-
-        }
-
         // To fill in the background Cell color of a datagridview based on Ranking
-        private void FillCellColor(DataGridViewRow Row, int Ind, string Tier) {
+        public static void FillCellColor(DataGridViewRow Row, int Ind, string Tier) {
             switch (Tier) {
-                case "Unranked":
-                    Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(UNRANKHEX);
-                    break;
-                case "Bronze":
+                case BRONZE:
                     Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(BRONZEHEX);
                     break;
-                case "Silver":
+                case SILVER:
                     Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(SILVERHEX);
                     break;
-                case "Gold":
+                case GOLD:
                     Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(GOLDHEX);
                     break;
-                case "Platinum":
+                case PLATINUM:
                     Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(PLATHEX);
                     break;
-                case "Diamond":
+                case DIAMOND:
                     Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(DIAMONDHEX);
                     break;
-                case "Master":
+                case MASTER:
                     Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(MASTERHEX);
                     break;
-                case "Challenger":
+                case CHALLENGER:
                     Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(CHALLENGERHEX);
                     break;
                 default:
@@ -131,18 +139,6 @@ namespace LoLBalancing
             label_Total.Text = "Total Players: " + numPlayers;
         }
 
-        // Adjusts the range to remove the horizontal scroll
-        private void Update_dgvHeaderSize() {
-            if (dataGridView_Players.Rows.Count > MAX_PLAYERS_SCROLL) {
-                duo_Col.MinimumWidth = DEFAULT_LASTCOL_WIDTH - SCROLLBAR_WIDTH;
-                duo_Col.Width = DEFAULT_LASTCOL_WIDTH - SCROLLBAR_WIDTH;
-            }
-            else {
-                duo_Col.MinimumWidth = DEFAULT_LASTCOL_WIDTH;
-                duo_Col.Width = DEFAULT_LASTCOL_WIDTH;
-            }
-        }
-
         #endregion
 
         #region Event Handlers (Opening/Closing MainForm)
@@ -151,16 +147,62 @@ namespace LoLBalancing
             label_Version.Text = "v" + VERSION + " by Steven Duan (sduans@umich.edu)";
             // Find a way to resize between different computers
             // https://stackoverflow.com/questions/8691951/can-the-datagridview-header-automatically-resize-itself
-            
-            // Load Properties.Settings
 
-            // Load in player rankings
+            // Load Properties.Settings
+            try {
+                string ptsList = Properties.Settings.Default.pointsList;
+                string[] ptsListArr = ptsList.Split(' ');
+                if (ptsListArr.Length == DEFAULT_PLAYER2VALUE.Count) {
+                    int i = 0; // index for ptsListArr
+                    foreach (string rank in DEFAULT_PLAYER2VALUE.Keys) {
+                        currRank2Pts.Add(rank, int.Parse(ptsListArr[i]));
+                        i++;
+                    }
+                    // This is totally assuming that they're equal size
+                }
+            }
+            catch { }
+            // Remember to check for empty currRank2Pts
+            if (currRank2Pts.Count == 0) {
+                foreach (string rank in DEFAULT_PLAYER2VALUE.Keys) {
+                    currRank2Pts.Add(rank, DEFAULT_PLAYER2VALUE[rank]);
+                }
+            }
+
+            string balSetStr = Properties.Settings.Default.balanceSettings;
+            string[] balSetArr = balSetStr.Split(' ');
+            try { numeric_Threshold.Value = int.Parse(balSetArr[0]); } catch { }
+            try { numeric_StartSeed.Value = int.Parse(balSetArr[1]); } catch { }
+            try { checkBox_TrueRandom.Checked = bool.Parse(balSetArr[2]); } catch { }
+            try { numeric_MaxChecks.Value = int.Parse(balSetArr[3]); } catch { }
+            try { checkBox_BestOutput.Checked = bool.Parse(balSetArr[4]); } catch { }
+            try { numeric_Secondary.Value = int.Parse(balSetArr[5]); } catch { }
+            try { numeric_AutoFill.Value = int.Parse(balSetArr[6]); } catch { }
+            try { checkBox_WriteRange.Checked = bool.Parse(balSetArr[7]); } catch { }
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
             // Save into Properties.Settings
+            string ptsList = "";
+            foreach (string rank in currRank2Pts.Keys) {
+                int pt = currRank2Pts[rank];
+                ptsList += pt + " ";
+            }
+            ptsList.TrimEnd(' ');
+            Properties.Settings.Default.pointsList = ptsList;
 
-            // Properties.Settings.Default.Save();
+            StringBuilder sbSettings = new StringBuilder();
+            sbSettings.Append(numeric_Threshold.Value + " ");       // [0] (int)
+            sbSettings.Append(numeric_StartSeed.Value + " ");       // [1] (int)
+            sbSettings.Append(checkBox_TrueRandom.Checked + " ");   // [2] (bool)
+            sbSettings.Append(numeric_MaxChecks.Value + " ");       // [3] (int)
+            sbSettings.Append(checkBox_BestOutput.Checked + " ");   // [4] (bool)
+            sbSettings.Append(numeric_StartSeed.Value + " ");       // [5] (int)
+            sbSettings.Append(numeric_AutoFill.Value + " ");        // [6] (int)
+            sbSettings.Append(checkBox_WriteRange.Checked);         // [7] (bool)
+            Properties.Settings.Default.balanceSettings = sbSettings.ToString();
+
+            Properties.Settings.Default.Save();
         }
 
         #endregion
@@ -172,7 +214,6 @@ namespace LoLBalancing
             AddPlayer Player_Win = new AddPlayer();
             Player_Win.AddDialog(ref dataGridView_Players);
             Update_TotPlayers();
-            Update_dgvHeaderSize();
         }
 
         // OpenDialog Excel
@@ -196,7 +237,7 @@ namespace LoLBalancing
                 Excel.Worksheet Sheet = xlWorkBook.Worksheets.get_Item(1);
                 dataGridView_Players.Rows.Clear();
                 string name = "", summoner = "", tier = "", division = "", primary = "", secondary = "", duo = "";
-                for (int i = 2; Sheet.Cells[i, 1].value != null; ++i) { // Start at Row 2
+                for (int i = START_EXCEL_ROW; Sheet.Cells[i, 1].value != null; ++i) {
                     int column = 1;
                     try { name = Sheet.Cells[i, column++].value.ToString(); } catch { name = ""; }
                     try { summoner = Sheet.Cells[i, column++].value.ToString(); } catch { summoner = ""; }
@@ -209,10 +250,9 @@ namespace LoLBalancing
                     dataGridView_Players.Rows.Add(button, name, summoner, tier, division, primary, secondary, duo);
                     DataGridViewRow playerCell = dataGridView_Players.Rows[dataGridView_Players.Rows.Count - 1];
                     playerCell.Cells[0].Value = "X";
-                    FillCellColor(playerCell, 3, tier);
+                    FillCellColor(playerCell, TIER_ROW, tier);
                     // Update Players
                     Update_TotPlayers();
-                    Update_dgvHeaderSize();
                 }
                 xlWorkBook.Close();
                 xlApp.Quit();
@@ -271,28 +311,25 @@ namespace LoLBalancing
                     string tier = playerRow.Cells[column].Value.ToString();
                     xlWorkSheet.Cells[row, column] = tier;
                     switch (tier) {
-                        case "Unranked":
-                            xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(UNRANKHEX));
-                            break;
-                        case "Bronze":
+                        case BRONZE:
                             xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(BRONZEHEX));
                             break;
-                        case "Silver":
+                        case SILVER:
                             xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(SILVERHEX));
                             break;
-                        case "Gold":
+                        case GOLD:
                             xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(GOLDHEX));
                             break;
-                        case "Platinum":
+                        case PLATINUM:
                             xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(PLATHEX));
                             break;
-                        case "Diamond":
+                        case DIAMOND:
                             xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(DIAMONDHEX));
                             break;
-                        case "Master":
+                        case MASTER:
                             xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(MASTERHEX));
                             break;
-                        case "Challenger":
+                        case CHALLENGER:
                             xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(CHALLENGERHEX));
                             break;
                         default:
@@ -321,7 +358,7 @@ namespace LoLBalancing
             }
         }
 
-        // Creates a new Template to go off of
+        // Creates a new Template for Excel sheet
         private void button_newTemplate_Click(object sender, EventArgs e) {
             SaveFileDialog saveExcelDialog = new SaveFileDialog();
             saveExcelDialog.Filter = "Excel Sheet (*.xlsx)|*.xlsx";
@@ -398,26 +435,21 @@ namespace LoLBalancing
                 }
             }
             Update_TotPlayers();
-            Update_dgvHeaderSize();
         }
 
         #endregion
 
         #region Event Handlers (TabPage: Balancing)
 
-        // Constant variables
-        private const int MIN_PLAYERS = 40;
-        private const int NUM_ROLES = 5;
-
         // String -> Tier
         private static Dictionary<string, Tier> STRING_TO_TIER = new Dictionary<string, Tier>() {
-            { "Bronze", Tier.BRONZE },
-            { "Silver", Tier.SILVER },
-            { "Gold", Tier.GOLD },
-            { "Platinum", Tier.PLATINUM },
-            { "Diamond", Tier.DIAMOND },
-            { "Master", Tier.MASTER },
-            { "Challenger", Tier.MASTER }
+            { BRONZE, Tier.BRONZE },
+            { SILVER, Tier.SILVER },
+            { GOLD, Tier.GOLD },
+            { PLATINUM, Tier.PLATINUM },
+            { DIAMOND, Tier.DIAMOND },
+            { MASTER, Tier.MASTER },
+            { CHALLENGER, Tier.MASTER }
         };
 
         // String -> Role
@@ -425,7 +457,7 @@ namespace LoLBalancing
             { "Top", Role.TOP },
             { "Jungle", Role.JNG },
             { "Mid", Role.MID },
-            { "ADC", Role.BOT },
+            { "ADC", Role.ADC },
             { "Support", Role.SUP },
             { "Fill", Role.FILL }
         };
@@ -435,295 +467,14 @@ namespace LoLBalancing
             Application.DoEvents();
             Cursor.Current = Cursors.WaitCursor;
             richTextBox_Console.Clear();
-            int parseRow = 0;
-            // IGN -> Player Obj.
-            Dictionary<Name, Player> roster = new Dictionary<Name, Player>();
-            // IGN -> duoIGN.
-            Dictionary<Name, Name> duoList = new Dictionary<Name, Name>();
-            try {
-                foreach (DataGridViewRow playerRow in dataGridView_Players.Rows) {
-                    string playerName = playerRow.Cells[1].Value.ToString();
-                    Name playerIGN = new Name(playerRow.Cells[2].Value.ToString());
-                    Tier playerTier = STRING_TO_TIER[playerRow.Cells[3].Value.ToString()];
-                    int playerDiv = int.Parse(playerRow.Cells[4].Value.ToString());
-                    Role playerPri = STRING_TO_ROLE[playerRow.Cells[5].Value.ToString()];
-                    Role playerSec = (playerPri == Role.FILL) ?
-                            Role.FILL : STRING_TO_ROLE[playerRow.Cells[6].Value.ToString()];
-                    if (playerPri == playerSec && playerPri != Role.FILL) {
-                        string msg = playerName + ": Filled out same primary and secondary role.";
-                        write_ConsoleLog(msg, false);
-                        playerSec = Role.FILL;
-                    }
-                    Name playerDuo = new Name(playerRow.Cells[7].Value.ToString());
-                    if (playerDuo == playerIGN) {
-                        string msg = playerIGN + ": Wrote themselves as their duo.";
-                        write_ConsoleLog(msg, false);
-                        playerDuo.name = "";
-                    }
-                    duoList.Add(playerIGN, playerDuo);
-                    roster.Add(playerIGN, new Player(playerName, playerIGN,
-                        playerTier, playerDiv, playerPri, playerSec, playerDuo));
-                }
 
-            }
-            catch (Exception ex) {
-                string msg = "ERROR - Parsing Inputs: " + ex.Message + ". Check Row: " + parseRow;
-                write_ConsoleLog(msg, true);
-                return;
-            }
-
-            // ----- Check number of Players
-            if (roster.Count < MIN_PLAYERS) {
-                string msg = "ERROR - Total number of Players needs to be 40.";
-                write_ConsoleLog(msg, true);
-                return;
-            }
-            if (roster.Count % NUM_ROLES != 0) {
-                string msg = "ERROR - Total number of Players is not divisible by 5.";
-                write_ConsoleLog(msg, true);
-                return;
-            }
-            int numTeams = roster.Count / NUM_ROLES;
-            // ----- Validate duos and their Roles
-            List<Name> noDuoList = new List<Name>();
-            foreach (Name summoner in duoList.Keys) {
-                try {
-                    Name duoIGN = duoList[summoner];
-                    Name ogIGN = duoList[duoIGN];
-                    if (summoner != ogIGN) {
-                        throw new Exception();
-                        // Pretty much being treated as not finding a Key
-                        // It's bad practice, but suitable
-                    }
-                    // At this point, the duos are confirmed.
-                    // Now both duos roles for primary and secondary must be different
-                    // If not, Fill for both primary and secondary
-                    // 1) If Primary/Secondary are the same
-                    Player origPlayer = roster[summoner];
-                    Player duoPlayer = roster[duoIGN];
-                    if ((origPlayer.primaryRole == duoPlayer.secondRole && origPlayer.secondRole == duoPlayer.primaryRole) &&
-                        (origPlayer.primaryRole != Role.FILL || duoPlayer.primaryRole != Role.FILL)) {
-                        string msg = summoner + " and " + duoIGN + 
-                            ": Both duos for primary and secondary were interchangeably the same.";
-                        write_ConsoleLog(msg, false);
-                        origPlayer.secondRole = Role.FILL;
-                        duoPlayer.secondRole = Role.FILL;
-                    }
-                    // 2) If both Primary is same
-                    // Roll a number on who to bump Secondary to Primary, and make Secondary Fill
-                    if (origPlayer.primaryRole == duoPlayer.primaryRole) {
-                        string msg = summoner + " and " + duoIGN +
-                            ": Both duos had the same primary role.";
-                        write_ConsoleLog(msg, false);
-                        if (randomNumber(1, 2, 0, false) == 1) {
-                            origPlayer.primaryRole = origPlayer.secondRole;
-                            origPlayer.secondRole = Role.FILL;
-                        }
-                        else {
-                            duoPlayer.primaryRole = origPlayer.secondRole;
-                            origPlayer.secondRole = Role.FILL;
-                        }
-                    }
-                }
-                catch {
-                    // Player couldn't be found or incorrect, so we blank out duo
-                    Player player = roster[summoner];
-                    if (!string.IsNullOrWhiteSpace(player.duo.name)) {
-                        string msg = summoner + ": Duo \"" + player.duo + "\" does not exist.";
-                        write_ConsoleLog(msg, false);
-                    }
-                    player.duo.name = "";
-                    // Can't modify duoList yet, so store the name
-                    noDuoList.Add(summoner);
-                }
-            }
-            // Blank out duoList
-            foreach (Name summoner in noDuoList) {
-                duoList[summoner].name = "";
-            }
-            // Final count on how many duos
-            int numDuos = 0;
-            foreach (Name duo in duoList.Values) {
-                if (!string.IsNullOrWhiteSpace(duo.name)) { numDuos++; }
-            }
-            // At maximum, only 60% of the roster should be Duos
-            int maxDuos = roster.Count * 6 / 10;
-            if (numDuos > maxDuos) {
-                string msg = "There are " + numDuos + " valid duos, which is over 60% of the Roster (" + maxDuos + ")";
-                write_ConsoleLog(msg, true);
-                return;
-            }
-
-            // ----- PART 2: ASSIGN ROLES
-            int lowestRange = (int)numeric_Threshold.Value + 1;
-            int randSeed = (int)numeric_StartSeed.Value - 1, currChecks = 0;
-            Balance bestBalance = new Balance(); // This will store our bestBalance
-            // Begin megaloop
-            while (lowestRange != (int)numeric_Threshold.Value && 
-                currChecks < (int)numeric_MaxChecks.Value) {
-                currChecks++; randSeed++;
-                // Preparations: Make a deep copy of roster that can be edited
-                Dictionary<Name, Player> masterList = deepClone(roster);
-                // Begin
-                Dictionary<Role, List<Player>> assignRoleList = new Dictionary<Role, List<Player>>() {
-                    { Role.TOP, new List<Player>() },
-                    { Role.JNG, new List<Player>() },
-                    { Role.MID, new List<Player>() },
-                    { Role.BOT, new List<Player>() },
-                    { Role.SUP, new List<Player>() },
-                };
-                // Assign non-Fill Primary Roles
-                try {
-                    assignRoles(ref masterList, ref assignRoleList, duoList,
-                        numTeams, randSeed, true);
-                }
-                catch (Exception ex) {
-                    string msg = "ERROR - Assigning primary roles. " +
-                        "Reason: " + ex.Message;
-                    write_ConsoleLog(msg, true);
-                    return;
-                }
-                // Assign non-Fill Secondary Roles
-                try {
-                    assignRoles(ref masterList, ref assignRoleList, duoList,
-                        numTeams, randSeed, false);
-                }
-                catch (Exception ex) {
-                    string msg = "ERROR - Assigning secondary roles. " +
-                        "Reason: " + ex.Message;
-                    write_ConsoleLog(msg, true);
-                    return;
-                }
-                // the remaining masterList is now fillList.
-                while (masterList.Count > 0) {
-                    // Find role with smallest points, and add a random player
-                    Role addFillRole = roleMinPointsFill(assignRoleList, numTeams);
-                    Player addPlayer = masterList.Values.ToList().Max(); // Greedy approach
-                    addPlayer.assignedRole = addFillRole;
-                    assignRoleList[addFillRole].Add(addPlayer);
-                    masterList.Remove(addPlayer.ign);
-                    // Make sure the player does not have the same role as their duo
-                    // If so, randomly switch a solo player who is autoFill -> secondary -> Primary 
-                    // from another role
-                    if (containsName(assignRoleList[addFillRole], addPlayer.duo)) {
-                        Player swapPlayer = aSoloFromRole(assignRoleList, addFillRole, randSeed);
-                        Role swapRole = swapPlayer.assignedRole;
-                        assignRoleList[swapRole].Remove(swapPlayer);
-                        assignRoleList[addFillRole].Remove(addPlayer);
-                        swapPlayer.assignedRole = addFillRole;
-                        assignRoleList[addFillRole].Add(swapPlayer);
-                        addPlayer.assignedRole = swapRole;
-                        assignRoleList[swapRole].Add(addPlayer);
-                    }
-                }
-                // Validation: Should hopefully never occur
-                foreach (List<Player> roleList in assignRoleList.Values) {
-                    if (roleList.Count != numTeams) {
-                        string msg = "ERROR - assignRoleList does not have numTeams";
-                        write_ConsoleLog(msg, true);
-                        return;
-                    }
-                }
-
-                // ---- PART 3: BALANCING
-                // Initialize the Balance abstract
-                Balance currBalance = new Balance(assignRoleList, out lowestRange);
-                // All queues acting as a clock queue
-                int currMaxIndex = currBalance.getMaxTeamIndex();
-                int currMinIndex = currBalance.getMinTeamIndex();
-                int rolesRemain = NUM_ROLES;
-                Queue<Role> roleQ = new Queue<Role>(new Role[] {
-                    Role.TOP, Role.JNG, Role.MID, Role.BOT, Role.SUP });
-                Queue<int> maxIndexQ = new Queue<int>();
-                Queue<int> minIndexQ = new Queue<int>();
-                for (int i = 0; i < numTeams; ++i) {
-                    maxIndexQ.Enqueue(i);
-                    minIndexQ.Enqueue(i);
-                }
-                // Conditions:
-                // 1) rolesRemaining == 0
-                // If lowestRange changes: rolesRemaining set back to 5
-                // To move onto the next Role
-                // 1) Check every iteration of minTeamIndex (minCheckRemain == 0)
-                // 2) Check every iteration of maxTeamIndex (maxCheckRemain == 0)
-                // If lowestRange changes: both checkRemaining set back to numTeams
-                // Break entirely if: 
-                // 1) lowestRange <= THRESHOLD
-                while (rolesRemain > 0) {
-                    Role checkRole = roleQ.Peek();
-                    int minCheckRemain = numTeams, maxCheckRemain = numTeams;
-                    bool minFlag = true;
-                    // Check within each Role
-                    while (!(minCheckRemain == 0 && maxCheckRemain == 0)) {
-                        // Work on minIndex first
-                        int swapIndex = (minFlag) ? minIndexQ.Peek() : maxIndexQ.Peek();
-                        int newRange = (minFlag) ?
-                            currBalance.switchPlayer(checkRole, currMinIndex, swapIndex) :
-                            currBalance.switchPlayer(checkRole, currMaxIndex, swapIndex);
-                        if (newRange < lowestRange) {
-                            // Condition 2: New minRange
-                            bestBalance = deepClone(currBalance);
-                            currMinIndex = currBalance.getMinTeamIndex();
-                            currMaxIndex = currBalance.getMaxTeamIndex();
-                            lowestRange = newRange;
-                            minCheckRemain = numTeams;
-                            maxCheckRemain = numTeams;
-                            rolesRemain = NUM_ROLES;
-                            minFlag = true;
-                        }
-                        else {
-                            // Condition 3: Continue iterating. Switch currBalance back
-                            if (minFlag) {
-                                minCheckRemain--;
-                                currBalance.switchPlayer(checkRole, currMinIndex, swapIndex);
-                            }
-                            else {
-                                maxCheckRemain--;
-                                currBalance.switchPlayer(checkRole, currMaxIndex, swapIndex);
-                            }
-                            if (minCheckRemain == 0) {
-                                minFlag = false;
-                            }
-                        }
-                        // Cycle through the clock queue
-                        if (minFlag) {
-                            minIndexQ.Dequeue();
-                            minIndexQ.Enqueue(swapIndex);
-                        }
-                        else {
-                            maxIndexQ.Dequeue();
-                            maxIndexQ.Enqueue(swapIndex);
-                        }
-                    }
-                    // Made it to the end of a complete role check
-                    rolesRemain--;
-                    roleQ.Dequeue();
-                    roleQ.Enqueue(checkRole);
-                }
-                // An entire "seedCheck" is finished here
-                if (checkBox_WriteRange.Checked) {
-                    string msg = "Lowest range in Seed " + randSeed + ": " + lowestRange;
-                    write_ConsoleLog(msg, false);
-                }
-            }
-            Cursor.Current = Cursors.Default;
-            // ---- PART 4: OUTPUT BEST
-            // If we got to this point, that means bestBalance has our best teams
-            if (lowestRange <= (int)numeric_Threshold.Value &&
-                MessageBox.Show("A balance was found with a Range of " + lowestRange + " at seed " + randSeed +
-                    ".\nWould you like to save it?",
-                    "Finished", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                save_TeamsExcel(bestBalance);
-                // Output point values for each team in the consoleLog
-                write_ConsoleLog("Team Points Total", false);
-                for (int i = 0; i < numTeams; ++i) {
-                    string msg = "Team " + (i + 1) + ": " + bestBalance.teams[i].calcTeamValue();
-                    write_ConsoleLog(msg, false);
-                }
-            }
-            else if (lowestRange > (int)numeric_Threshold.Value) {
-                MessageBox.Show("Could not find a balance with that threshold.");
-            }
+            StartAlgo balanceFXN = new StartAlgo((int)numeric_Threshold.Value, (int)numeric_StartSeed.Value,
+                (int)numeric_MaxChecks.Value, checkBox_TrueRandom.Checked, checkBox_WriteRange.Checked);
+            if (!balanceFXN.loadParamsFunction(dataGridView_Players,
+                (int)numeric_Secondary.Value, (int)numeric_AutoFill.Value)) { richTextBox_Console.Text += balanceFXN.consoleOut(); return; }
+            if (!balanceFXN.validateDuosFunction()) { richTextBox_Console.Text += balanceFXN.consoleOut(); return; }
+            if (!balanceFXN.balance()) { richTextBox_Console.Text += balanceFXN.consoleOut(); return; }
+            richTextBox_Console.Text += balanceFXN.consoleOut();
         }
 
         // To enable/disable start seed value
@@ -741,263 +492,16 @@ namespace LoLBalancing
             richTextBox_Console.Text += msg + '\n';
         }
 
-        // Once Teams are completely balanced, output and save them into an Excel sheet.
-        private void save_TeamsExcel(Balance outBalance) {
-            SaveFileDialog sfd_Excel = new SaveFileDialog();
-            sfd_Excel.Filter = "Excel Sheet (*.xlsx)|*.xlsx";
-            sfd_Excel.Title = "Save Teams";
-            if (sfd_Excel.ShowDialog() == DialogResult.OK) {
-                Application.DoEvents();
-                Cursor.Current = Cursors.WaitCursor;
-                // Make an Excel Sheet
-                Excel.Application xlApp = new Excel.Application();
-                Excel.Workbook xlWorkBook;
-                Excel.Worksheet xlWorkSheet;
-                object mis = System.Reflection.Missing.Value;
-                xlWorkBook = xlApp.Workbooks.Add(mis);
-                xlWorkSheet = (Excel.Worksheet)xlWorkBook.ActiveSheet;
-                xlWorkSheet.Name = "Teams Balance";
-                try {
-                    xlWorkSheet.PageSetup.PaperSize = Excel.XlPaperSize.xlPaper11x17;
-                    xlWorkSheet.PageSetup.Orientation = Excel.XlPageOrientation.xlLandscape;
-                }
-                catch { }
-
-                #region Make Excel Sheet
-                xlWorkSheet.Columns["A"].ColumnWidth = 20.00;   // Name
-                xlWorkSheet.Columns["B"].ColumnWidth = 20.00;   // Summoner Name
-                xlWorkSheet.Columns["C"].ColumnWidth = 20.00;   // Assigned Role
-                xlWorkSheet.Columns["D"].ColumnWidth = 15.00;   // Ranking
-                xlWorkSheet.Cells[1, 1] = "Name";
-                xlWorkSheet.Cells[1, 2] = "Summoner Name";
-                xlWorkSheet.Cells[1, 3] = "Assigned Role";
-                xlWorkSheet.Cells[1, 4] = "Ranking";
-                xlWorkSheet.Rows[1].Font.Bold = true;
-                xlWorkSheet.Rows[1].Font.Underline = true;
-                xlWorkSheet.get_Range("A1", "D1").Cells.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
-
-                int row = 3, team = 1;
-                List<Role> roleList = new List<Role>(new Role[] {
-                            Role.TOP, Role.JNG, Role.MID, Role.BOT, Role.SUP });
-                Dictionary<Role, string> role2String = new Dictionary<Role, string>() {
-                            { Role.TOP, "Top" },
-                            { Role.JNG, "Jungle" },
-                            { Role.MID, "Mid" },
-                            { Role.BOT, "ADC" },
-                            { Role.SUP, "Support" },
-                            { Role.NONE, "None" }
-                        };
-                Dictionary<Tier, string> tier2String = new Dictionary<Tier, string>() {
-                            { Tier.BRONZE, "Bronze" },
-                            { Tier.SILVER, "Silver" },
-                            { Tier.GOLD, "Gold" },
-                            { Tier.PLATINUM, "Platinum" },
-                            { Tier.DIAMOND, "Diamond" },
-                            { Tier.MASTER, "Master" }
-                        };
-                foreach (Team teamSel in outBalance.teams) {
-                    xlWorkSheet.Cells[row, 1] = "Team " + team;
-                    xlWorkSheet.get_Range("A" + row, "D" + row).Merge();
-
-                    foreach (Role role in roleList) {
-                        row++;
-                        Player player = teamSel.getPlayerRole(role);
-                        xlWorkSheet.Cells[row, 1] = player.name;
-                        string ignString = player.ign.name;
-                        if (player.hasDuo()) { ignString += " (D)"; }
-                        xlWorkSheet.Cells[row, 2] = ignString;
-                        string roleString = role2String[player.assignedRole];
-                        if (player.isAutoFilled()) { roleString += " (Autofilled)"; }
-                        xlWorkSheet.Cells[row, 3] = roleString;
-                        string ranking = tier2String[player.tier] + " ";
-                        if (player.tier != Tier.MASTER) { ranking += player.division; }
-                        xlWorkSheet.Cells[row, 4] = ranking;
-                        switch (player.tier) {
-                            case Tier.BRONZE:
-                                xlWorkSheet.Cells[row, 4].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(BRONZEHEX));
-                                break;
-                            case Tier.SILVER:
-                                xlWorkSheet.Cells[row, 4].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(SILVERHEX));
-                                break;
-                            case Tier.GOLD:
-                                xlWorkSheet.Cells[row, 4].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(GOLDHEX));
-                                break;
-                            case Tier.PLATINUM:
-                                xlWorkSheet.Cells[row, 4].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(PLATHEX));
-                                break;
-                            case Tier.DIAMOND:
-                                xlWorkSheet.Cells[row, 4].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(DIAMONDHEX));
-                                break;
-                            case Tier.MASTER:
-                                xlWorkSheet.Cells[row, 4].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(CHALLENGERHEX));
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    row++; row++; team++;
-                }
-                #endregion
-
-                releaseObject(xlWorkSheet);
-                string filename = sfd_Excel.FileName;
-                try {
-                    xlApp.DisplayAlerts = false;
-                    xlWorkBook.SaveAs(filename);
-                    xlApp.Visible = true;
-                }
-                catch (Exception ex) {
-                    MessageBox.Show("Can't overwrite file. Please save it as another name." + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                releaseObject(xlWorkBook);
-                releaseObject(xlApp);
-                Cursor.Current = Cursors.Default;
-            }
+        // Makes a new window that allows point values to be customized from rank
+        private void button_CustomPoints_Click(object sender, EventArgs e) {
+            Rank2Pts_Form rank2ptsWin = new Rank2Pts_Form();
+            rank2ptsWin.openForm(ref currRank2Pts);
         }
 
-        // Deep Copy function
-        public T deepClone<T>(T obj) {
-            using (var ms = new MemoryStream()) {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(ms, obj);
-                ms.Position = 0;
-                return (T)formatter.Deserialize(ms);
-            }
-        }
-
-        // Rolls a uniform random number between min and max
-        private int randomNumber(int min, int max, int seedVal, bool notPseudo) {
-            Random rnd = (notPseudo) ? new Random() : new Random(seedVal);
-            return rnd.Next(min, max);
-        }
-
-        // Assigning roles from masterList based on primary or secondary
-        private void assignRoles(ref Dictionary<Name, Player> masterList,
-            ref Dictionary<Role, List<Player>> assignRoleList,
-            Dictionary<Name, Name> duoList,
-            int numTeams, int randSeed, bool primaryRole) {
-            // Fxn start
-            List<Name> removeList = new List<Name>();
-            foreach (Name ign in masterList.Keys) {
-                Player player = masterList[ign];
-                Name duoName = duoList[ign];
-                Role role = (primaryRole) ? player.primaryRole : player.secondRole;
-                if (role != Role.FILL && !containsName(assignRoleList[role], duoName)) {
-                    player.assignedRole = role;
-                    assignRoleList[role].Add(player);
-                    // Remove from masterList
-                    // Currently immutabale due to iteration. Remove later
-                    removeList.Add(ign);
-                }
-            }
-            foreach (Name removeKey in removeList) {
-                masterList.Remove(removeKey);
-            }
-            // From Autofill options, determine the option number
-            int roleChangeOption = 0;
-            if (radioButton_Best.Checked) { roleChangeOption = 1; }
-            else if (radioButton_High.Checked) { roleChangeOption = 2; }
-            else if (radioButton_Low.Checked) { roleChangeOption = 3; }
-            // Check if each Role has more than 8 players.
-            // If so, "roleChange" a player
-            foreach (List<Player> roleList in assignRoleList.Values) {
-                while (roleList.Count > numTeams) {
-                    // Used to determine who gets kicked
-                    Player changePlayer = roleChange(roleChangeOption, roleList, randSeed, primaryRole);
-                    roleList.Remove(changePlayer);
-                    changePlayer.assignedRole = Role.NONE;
-                    masterList.Add(changePlayer.ign, changePlayer);
-                }
-            }
-        }
-
-        // Removes a player from the roleList if > numTeams
-        // Based on the option, it determines who gets kicked
-        // The Player getting kicked is returned.
-        private Player roleChange(int option, List<Player> roleList,
-            int randSeed, bool primary) {
-            // Make a new list of secondaries if primary = false
-            List<Player> roleSecList = new List<Player>();
-            if (!primary) {
-                foreach (Player addPlayer in roleList) {
-                    if (addPlayer.isSecondaryAssigned()) {
-                        roleSecList.Add(addPlayer);
-                    }
-                }
-            }
-            Player changePlayer = new Player();
-            if (option == 1) {
-                // Method 1: Remove by random
-                int index = (primary) ?
-                    randomNumber(0, roleList.Count - 1, randSeed, checkBox_TrueRandom.Checked) :
-                    randomNumber(0, roleSecList.Count - 1, randSeed, checkBox_TrueRandom.Checked);
-                changePlayer = (primary) ? roleList[index] : roleSecList[index];
-            }
-            else if (option == 2) {
-                // Method 2: Remove the higher ranked
-                changePlayer = (primary) ? roleList.Max() : roleSecList.Max();
-            }
-            else if (option == 3) {
-                // Method 3: Remove the lower ranked
-                changePlayer = (primary) ? roleList.Min() : roleSecList.Min();
-            }
-            return changePlayer;
-        }
-
-        // Figure out which role that's < numTeams has the least
-        private Role roleMinPointsFill(Dictionary<Role, List<Player>> assignRoleList,
-            int numTeams) {
-            Role retRole = Role.NONE;
-            int smallest = 9000;    // yeah...
-            foreach (Role role in assignRoleList.Keys) {
-                if (assignRoleList[role].Count < numTeams) {
-                    int roleTotalVal = 0;
-                    foreach (Player player in assignRoleList[role]) {
-                        roleTotalVal += player.rankValue(true);
-                    }
-                    if (roleTotalVal < smallest) {
-                        smallest = roleTotalVal;
-                        retRole = role;
-                    }
-                }
-            }
-            return retRole;
-        }
-
-        // Returns a random autoFill -> Secondary -> Primary player from that role
-        private Player aSoloFromRole(Dictionary<Role, List<Player>> assignRoleList, 
-            Role ignoreRole, int seedVal) {
-            List<Player> playerPool = new List<Player>();
-            // AutoFill == 0, Secondary == 1, Primary == 2
-            for (int i = 0; i < 2; ++i) {
-                foreach (Role role in assignRoleList.Keys) {
-                    if (role == ignoreRole) { continue; }
-                    List<Player> roleList = assignRoleList[role];
-                    foreach (Player player in roleList) {
-                        if ((i == 0 && (player.isAutoFilled() || player.isRoleFilled())) ||
-                            (i == 1 && player.isSecondaryAssigned()) ||
-                            (i == 2 && player.isPrimaryAssigned()) &&
-                            !player.hasDuo()) {
-                            playerPool.Add(player);
-                        }
-                    }
-                }
-                if (playerPool.Count > 0) {
-                    return playerPool[randomNumber(0, playerPool.Count - 1, 
-                        seedVal, checkBox_TrueRandom.Checked)];
-                }
-            }
-            return new Player(); // should never get here
-        }
-
-        // Checks if the name is in the playerList
-        private bool containsName(List<Player> roleList, Name ign) {
-            foreach (Player player in roleList) {
-                if (player.ign == ign) {
-                    return true;
-                }
-            }
-            return false;
+        // Still doesn't work yet
+        private void checkBox_BestOutput_CheckedChanged(object sender, EventArgs e) {
+            if (checkBox_BestOutput.Checked) { numeric_Threshold.Enabled = false; }
+            else { numeric_Threshold.Enabled = true; }
         }
 
         #endregion

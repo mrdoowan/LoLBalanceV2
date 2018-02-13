@@ -31,28 +31,25 @@ namespace LoLBalancing
 				Player.Cells[0].Value = "X";
 				// Modify colors based on Ranking
 				switch (comboBox_Tier.Text) {
-                    case "Unranked":
-                        Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.UNRANKHEX);
-                        break;
-					case "Bronze":
+					case MainForm.BRONZE:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.BRONZEHEX);
 						break;
-					case "Silver":
+					case MainForm.SILVER:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.SILVERHEX);
 						break;
-					case "Gold":
+					case MainForm.GOLD:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.GOLDHEX);
 						break;
-					case "Platinum":
+					case MainForm.PLATINUM:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.PLATHEX);
 						break;
-					case "Diamond":
+					case MainForm.DIAMOND:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.DIAMONDHEX);
 						break;
-					case "Master":
+					case MainForm.MASTER:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.MASTERHEX);
 						break;
-					case "Challenger":
+					case MainForm.CHALLENGER:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.CHALLENGERHEX);
 						break;
 					default:
@@ -76,9 +73,10 @@ namespace LoLBalancing
                 RadioButton rb = (RadioButton)c;
                 if (rb.Text == primary) { rb.Checked = true; }
             }
+            string[] secondList = secondary.Replace(" ", "").Split(',');
             foreach (Control c in groupBox_SecondaryRoles.Controls) {
-                RadioButton rb = (RadioButton)c;
-                if (rb.Text == secondary) { rb.Checked = true; }
+                CheckBox rb = (CheckBox)c;
+                if (secondList.Contains(rb.Text)) { rb.Checked = true; }
             }
             textBox_Duo.Text = Players.SelectedRows[0].Cells[7].Value.ToString();
 			this.ShowDialog();
@@ -96,28 +94,25 @@ namespace LoLBalancing
 				Player.Cells[0].Value = "X";
 				// Modify colors based on Ranking
 				switch (comboBox_Tier.Text) {
-                    case "Unranked":
-                        Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.UNRANKHEX);
-                        break;
-                    case "Bronze":
+                    case MainForm.BRONZE:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.BRONZEHEX);
 						break;
-					case "Silver":
+					case MainForm.SILVER:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.SILVERHEX);
 						break;
-					case "Gold":
+					case MainForm.GOLD:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.GOLDHEX);
 						break;
-					case "Platinum":
+					case MainForm.PLATINUM:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.PLATHEX);
 						break;
-					case "Diamond":
+					case MainForm.DIAMOND:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.DIAMONDHEX);
 						break;
-					case "Master":
+					case MainForm.MASTER:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.MASTERHEX);
 						break;
-					case "Challenger":
+					case MainForm.CHALLENGER:
 						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.CHALLENGERHEX);
 						break;
 					default:
@@ -133,9 +128,10 @@ namespace LoLBalancing
                 if (rb.Checked) { primary = rb.Text; }
             }
             foreach (Control c in groupBox_SecondaryRoles.Controls) {
-                RadioButton rb = (RadioButton)c;
-                if (rb.Checked) { secondary = rb.Text; }
+                CheckBox rb = (CheckBox)c;
+                if (rb.Checked) { secondary += ", " + rb.Text; }
             }
+            secondary = secondary.TrimStart(',', ' ');
             // Do checks
             if (string.IsNullOrWhiteSpace(textBox_Name.Text)) {
                 MessageBox.Show("Please provide a name for the Player", "Error",
