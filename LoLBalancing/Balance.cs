@@ -16,7 +16,7 @@ namespace LoLBalancing
         public Balance() {
             teams = new List<Team>();
             roster = new Dictionary<Name, Player>();
-            rangeBalance = 0;
+            rangeBalance = int.MaxValue;
             maxTeamIndex = 0;
             minTeamIndex = 0;
         }
@@ -92,7 +92,7 @@ namespace LoLBalancing
 
         // Calculates range and updates it
         private void calcRange() {
-            int maxVal = 0, minVal = 9000;
+            int maxVal = 0, minVal = int.MaxValue;
             for (int i = 0; i < teams.Count; ++i) {
                 int teamVal = teams[i].calcTeamValue();
                 if (teamVal > maxVal) {
@@ -175,6 +175,11 @@ namespace LoLBalancing
         // Gets the index of the lowest Team Value
         public int getMinTeamIndex() {
             return minTeamIndex;
+        }
+
+        // Returns the range
+        public int getRange() {
+            return rangeBalance;
         }
     }
 }

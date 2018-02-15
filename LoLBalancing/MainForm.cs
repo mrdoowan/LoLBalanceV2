@@ -20,15 +20,15 @@ namespace LoLBalancing
 
         // Constants
         private const int NUM_PLAYERS = 5;
-        private const int MAX_PLAYERS_SCROLL = 12;
-        private const int DEFAULT_LASTCOL_WIDTH = 148;
-        private const int SCROLLBAR_WIDTH = 17;
+        //private const int MAX_PLAYERS_SCROLL = 12;
+        //private const int DEFAULT_LASTCOL_WIDTH = 148;
+        //private const int SCROLLBAR_WIDTH = 17;
         private const int START_EXCEL_ROW = 2;
         private const int TIER_ROW = 3;
 
         // Variables for upgrading
         //static private bool upgrading = false;
-        private const string VERSION = "2.1";
+        private const string VERSION = "3.0";
 
         // Ranking consts
         public const string BRONZE = "Bronze";
@@ -38,7 +38,7 @@ namespace LoLBalancing
         public const string DIAMOND = "Diamond";
         public const string MASTER = "Master";
         public const string CHALLENGER = "Challenger";
-        public readonly string[] TIER_LIST = 
+        public static readonly string[] TIER_LIST = 
             { BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, MASTER, CHALLENGER };
 
         // Color Codes for Ranks
@@ -171,7 +171,7 @@ namespace LoLBalancing
 
             string balSetStr = Properties.Settings.Default.balanceSettings;
             string[] balSetArr = balSetStr.Split(' ');
-            try { numeric_Threshold.Value = int.Parse(balSetArr[0]); } catch { }
+            try { numeric_DesThrshRange.Value = int.Parse(balSetArr[0]); } catch { }
             try { numeric_StartSeed.Value = int.Parse(balSetArr[1]); } catch { }
             try { checkBox_TrueRandom.Checked = bool.Parse(balSetArr[2]); } catch { }
             try { numeric_MaxChecks.Value = int.Parse(balSetArr[3]); } catch { }
@@ -192,12 +192,12 @@ namespace LoLBalancing
             Properties.Settings.Default.pointsList = ptsList;
 
             StringBuilder sbSettings = new StringBuilder();
-            sbSettings.Append(numeric_Threshold.Value + " ");       // [0] (int)
+            sbSettings.Append(numeric_DesThrshRange.Value + " ");       // [0] (int)
             sbSettings.Append(numeric_StartSeed.Value + " ");       // [1] (int)
             sbSettings.Append(checkBox_TrueRandom.Checked + " ");   // [2] (bool)
             sbSettings.Append(numeric_MaxChecks.Value + " ");       // [3] (int)
             sbSettings.Append(checkBox_BestOutput.Checked + " ");   // [4] (bool)
-            sbSettings.Append(numeric_StartSeed.Value + " ");       // [5] (int)
+            sbSettings.Append(numeric_Secondary.Value + " ");       // [5] (int)
             sbSettings.Append(numeric_AutoFill.Value + " ");        // [6] (int)
             sbSettings.Append(checkBox_WriteRange.Checked);         // [7] (bool)
             Properties.Settings.Default.balanceSettings = sbSettings.ToString();
@@ -468,13 +468,12 @@ namespace LoLBalancing
             Cursor.Current = Cursors.WaitCursor;
             richTextBox_Console.Clear();
 
-            StartAlgo balanceFXN = new StartAlgo((int)numeric_Threshold.Value, (int)numeric_StartSeed.Value,
-                (int)numeric_MaxChecks.Value, checkBox_TrueRandom.Checked, checkBox_WriteRange.Checked);
+            StartAlgo balanceFXN = new StartAlgo((int)numeric_DesThrshRange.Value, (int)numeric_StartSeed.Value,
+                (int)numeric_MaxChecks.Value, checkBox_TrueRandom.Checked, checkBox_WriteRange.Checked, checkBox_BestOutput.Checked);
             if (!balanceFXN.loadParamsFunction(dataGridView_Players,
-                (int)numeric_Secondary.Value, (int)numeric_AutoFill.Value)) { richTextBox_Console.Text += balanceFXN.consoleOut(); return; }
-            if (!balanceFXN.validateDuosFunction()) { richTextBox_Console.Text += balanceFXN.consoleOut(); return; }
-            if (!balanceFXN.balance()) { richTextBox_Console.Text += balanceFXN.consoleOut(); return; }
-            richTextBox_Console.Text += balanceFXN.consoleOut();
+                (int)numeric_Secondary.Value, (int)numeric_AutoFill.Value, ref richTextBox_Console)) { return; }
+            if (!balanceFXN.validateDuosFunction(ref richTextBox_Console)) { return; }
+            if (!balanceFXN.balance(ref richTextBox_Console)) { return; }
         }
 
         // To enable/disable start seed value
@@ -500,8 +499,16 @@ namespace LoLBalancing
 
         // Still doesn't work yet
         private void checkBox_BestOutput_CheckedChanged(object sender, EventArgs e) {
-            if (checkBox_BestOutput.Checked) { numeric_Threshold.Enabled = false; }
-            else { numeric_Threshold.Enabled = true; }
+            if (checkBox_BestOutput.Checked) { numeric_DesThrshRange.Enabled = false; }
+            else { numeric_DesThrshRange.Enabled = true; }
+        }
+
+        // To enable autoscrolling when the textbox spits output
+        private void richTextBox_Console_VisibleChanged(object sender, EventArgs e) {
+            if (richTextBox_Console.Visible) {
+                richTextBox_Console.SelectionStart = richTextBox_Console.TextLength;
+                richTextBox_Console.ScrollToCaret();
+            }
         }
 
         #endregion

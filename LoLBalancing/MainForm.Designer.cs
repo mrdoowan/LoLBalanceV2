@@ -27,8 +27,8 @@
 		private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -62,7 +62,7 @@
             this.checkBox_WriteRange = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.numeric_Threshold = new System.Windows.Forms.NumericUpDown();
+            this.numeric_DesThrshRange = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.numeric_MaxChecks = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
@@ -80,7 +80,7 @@
             this.groupBox_Setting.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_Secondary)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_AutoFill)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numeric_Threshold)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_DesThrshRange)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_MaxChecks)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_StartSeed)).BeginInit();
             this.SuspendLayout();
@@ -211,14 +211,14 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView_Players.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView_Players.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView_Players.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridView_Players.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView_Players.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.X_Col,
@@ -250,8 +250,8 @@
             // name_Col
             // 
             this.name_Col.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            this.name_Col.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            this.name_Col.DefaultCellStyle = dataGridViewCellStyle4;
             this.name_Col.HeaderText = "Name";
             this.name_Col.MinimumWidth = 120;
             this.name_Col.Name = "name_Col";
@@ -361,6 +361,7 @@
             this.richTextBox_Console.Size = new System.Drawing.Size(617, 146);
             this.richTextBox_Console.TabIndex = 1;
             this.richTextBox_Console.Text = "";
+            this.richTextBox_Console.VisibleChanged += new System.EventHandler(this.richTextBox_Console_VisibleChanged);
             // 
             // button_Balance
             // 
@@ -385,7 +386,7 @@
             this.groupBox_Setting.Controls.Add(this.checkBox_WriteRange);
             this.groupBox_Setting.Controls.Add(this.label7);
             this.groupBox_Setting.Controls.Add(this.label5);
-            this.groupBox_Setting.Controls.Add(this.numeric_Threshold);
+            this.groupBox_Setting.Controls.Add(this.numeric_DesThrshRange);
             this.groupBox_Setting.Controls.Add(this.label4);
             this.groupBox_Setting.Controls.Add(this.numeric_MaxChecks);
             this.groupBox_Setting.Controls.Add(this.label2);
@@ -403,7 +404,6 @@
             // 
             this.checkBox_BestOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBox_BestOutput.AutoSize = true;
-            this.checkBox_BestOutput.Enabled = false;
             this.checkBox_BestOutput.Location = new System.Drawing.Point(310, 20);
             this.checkBox_BestOutput.Name = "checkBox_BestOutput";
             this.checkBox_BestOutput.Size = new System.Drawing.Size(249, 17);
@@ -492,8 +492,7 @@
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(474, 57);
             this.label7.TabIndex = 19;
-            this.label7.Text = "Minimum of 40 Players.\r\nSuggested threshold = floor(#Players / 15). \r\nMaximum of " +
-    "(#Players * 60%) Duos";
+            this.label7.Text = "Minimum of 40 Players.\r\nMaximum of (#Players * 60%) Duos";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // label5
@@ -502,16 +501,16 @@
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(243, 20);
             this.label5.TabIndex = 16;
-            this.label5.Text = "Desired threshold range for Balance";
+            this.label5.Text = "Desired range threshold";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // numeric_Threshold
+            // numeric_DesThrshRange
             // 
-            this.numeric_Threshold.Location = new System.Drawing.Point(6, 19);
-            this.numeric_Threshold.Name = "numeric_Threshold";
-            this.numeric_Threshold.Size = new System.Drawing.Size(52, 20);
-            this.numeric_Threshold.TabIndex = 0;
-            this.numeric_Threshold.Value = new decimal(new int[] {
+            this.numeric_DesThrshRange.Location = new System.Drawing.Point(6, 19);
+            this.numeric_DesThrshRange.Name = "numeric_DesThrshRange";
+            this.numeric_DesThrshRange.Size = new System.Drawing.Size(52, 20);
+            this.numeric_DesThrshRange.TabIndex = 0;
+            this.numeric_DesThrshRange.Value = new decimal(new int[] {
             4,
             0,
             0,
@@ -523,7 +522,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(243, 20);
             this.label4.TabIndex = 14;
-            this.label4.Text = "Max number of checks (pref 250)";
+            this.label4.Text = "Max number of checks (pref 200)";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // numeric_MaxChecks
@@ -543,7 +542,7 @@
             this.numeric_MaxChecks.Size = new System.Drawing.Size(52, 20);
             this.numeric_MaxChecks.TabIndex = 8;
             this.numeric_MaxChecks.Value = new decimal(new int[] {
-            250,
+            200,
             0,
             0,
             0});
@@ -641,7 +640,7 @@
             this.groupBox_Setting.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_Secondary)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_AutoFill)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numeric_Threshold)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_DesThrshRange)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_MaxChecks)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_StartSeed)).EndInit();
             this.ResumeLayout(false);
@@ -677,7 +676,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn secondary_Col;
         private System.Windows.Forms.DataGridViewTextBoxColumn duo_Col;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.NumericUpDown numeric_Threshold;
+        private System.Windows.Forms.NumericUpDown numeric_DesThrshRange;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown numeric_MaxChecks;
         private System.Windows.Forms.Label label2;
