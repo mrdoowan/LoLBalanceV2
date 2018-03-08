@@ -522,7 +522,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(243, 20);
             this.label4.TabIndex = 14;
-            this.label4.Text = "Max number of checks (pref 200)";
+            this.label4.Text = "Max number of checks (pref 100)";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // numeric_MaxChecks
@@ -542,7 +542,7 @@
             this.numeric_MaxChecks.Size = new System.Drawing.Size(52, 20);
             this.numeric_MaxChecks.TabIndex = 8;
             this.numeric_MaxChecks.Value = new decimal(new int[] {
-            200,
+            100,
             0,
             0,
             0});
@@ -585,7 +585,7 @@
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(243, 20);
             this.label9.TabIndex = 27;
-            this.label9.Text = "% lowered when Autofilled";
+            this.label9.Text = "% of value when Autofilled";
             this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // label6
@@ -595,7 +595,7 @@
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(243, 20);
             this.label6.TabIndex = 26;
-            this.label6.Text = "% lowered when Secondary or Filling";
+            this.label6.Text = "% of value when Secondary or Filling";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // label_Version

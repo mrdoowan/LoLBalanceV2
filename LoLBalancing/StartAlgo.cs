@@ -328,7 +328,7 @@ namespace LoLBalancing
                 // Validation: Should hopefully never occur
                 foreach (List<Player> roleList in assignRoleList.Values) {
                     if (roleList.Count != numTeams) {
-                        string msg = "ERROR - assignRoleList does not have numTeams";
+                        string msg = "ERROR - assignRoleList does not have numTeams\nIt might be impossible to form a Balance.";
                         write_ConsoleLog(msg, true, ref rtb);
                         return false;
                     }
