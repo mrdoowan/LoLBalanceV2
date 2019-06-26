@@ -28,7 +28,7 @@ namespace LoLBalancing
 
         // Variables for upgrading
         //static private bool upgrading = false;
-        private const string VERSION = "2.4";
+        private const string VERSION = "2.4.1";
 
         // Ranking consts
         public const string IRON = "Iron";
