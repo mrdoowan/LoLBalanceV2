@@ -11,8 +11,8 @@ namespace LoLBalancing
         private int fillPctDrop;
 
         // Public member functions
-        public string name;         // Real name of player (never use this for code)  
-        public Name ign;            // Summoner name
+        public string name;             // Real name of player (never use this for code)  
+        public Name ign;                // Summoner name
         public Tier tier;
         public int division;
         public Role primaryRole;        // Primary Role
@@ -37,11 +37,24 @@ namespace LoLBalancing
         }
         // so that string.IsNullorWhite fxn isn't overkilled
         public bool hasDuo() {
-            return (!string.IsNullOrWhiteSpace(duo.name));
+            return (!string.IsNullOrWhiteSpace(duo.ToString()));
         }
-        public string rankString() {
-            string str = TIER_TO_STRING[tier];
-            return (tier == Tier.MASTER || tier == Tier.CHALLENGER) ? str : str + " " + division.ToString();
+
+        // getter function for Tier in string
+        public string getTier() {
+            return TIER_TO_STRING[tier];
+        }
+
+        public string getRank() {
+            string str = getTier();
+            return (tier == Tier.MASTER || tier == Tier.GRANDMASTER ||
+                tier == Tier.CHALLENGER) ? str : str + " " + division.ToString();
+        }
+
+        // Getter function for player's ign
+        public string getName() {
+            if (ign == null) { return null; }
+            return ign.ToString();
         }
 
         // Default Ctor
@@ -61,7 +74,7 @@ namespace LoLBalancing
             name = name_;
             ign = ign_;
             tier = tier_;
-            division = (tier == Tier.MASTER) ? 5 : div_;
+            division = (tier == Tier.MASTER) ? StartAlgo.MAX_DIV : div_;
             primaryRole = pri_;
             secondRoles = sec_;
             duo = duo_;
@@ -74,7 +87,7 @@ namespace LoLBalancing
         // True takes assignedRole into account, False does not
         // standard y = mx - b, with b = (lowestRank) - 1
         public int rankValue() {
-            int pts = MainForm.currRank2Pts[this.rankString()];
+            int pts = MainForm.currRank2Pts[this.getRank()];
             // Any players filled or get their secondary role will be slightly lower
             if (isRoleFilled() || isSecondaryAssigned()) {
                 pts = pts * secondPctDrop / 100;
@@ -90,8 +103,8 @@ namespace LoLBalancing
         // 0 if equal ranked
         // 1 if higher ranked
         int IComparable<Player>.CompareTo(Player other) {
-            int sumOther = MainForm.currRank2Pts[other.rankString()];
-            int sumThis = MainForm.currRank2Pts[this.rankString()];
+            int sumOther = MainForm.currRank2Pts[other.getRank()];
+            int sumThis = MainForm.currRank2Pts[this.getRank()];
             if (sumOther > sumThis) { return -1; }
             else if (sumOther == sumThis) { return 0; }
             else { return 1; }
@@ -99,13 +112,15 @@ namespace LoLBalancing
 
         // Tier to string
         private Dictionary<Tier, string> TIER_TO_STRING = new Dictionary<Tier, string>() {
-            { Tier.BRONZE, "Bronze" },
-            { Tier.SILVER, "Silver" },
-            { Tier.GOLD, "Gold" },
-            { Tier.PLATINUM, "Platinum" },
-            { Tier.DIAMOND, "Diamond" },
-            { Tier.MASTER, "Masters" },
-            { Tier.CHALLENGER, "Challenger" }
+            { Tier.IRON, MainForm.IRON },
+            { Tier.BRONZE, MainForm.BRONZE },
+            { Tier.SILVER, MainForm.SILVER },
+            { Tier.GOLD, MainForm.GOLD },
+            { Tier.PLATINUM, MainForm.PLATINUM },
+            { Tier.DIAMOND, MainForm.DIAMOND },
+            { Tier.MASTER, MainForm.MASTER },
+            { Tier.GRANDMASTER, MainForm.GRANDMASTER },
+            { Tier.CHALLENGER, MainForm.CHALLENGER }
         };
     }
 }
@@ -115,12 +130,14 @@ namespace LoLBalancing
 {
     public enum Tier
     {
+        IRON,
         BRONZE,
         SILVER,
         GOLD,
         PLATINUM,
         DIAMOND,
         MASTER,
+        GRANDMASTER,
         CHALLENGER
     }
 

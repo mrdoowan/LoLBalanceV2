@@ -17,8 +17,8 @@ namespace LoLBalancing
 		}
 
 		private bool button_pressed = false;
-        private string primary = "";
-        private string secondary = "";
+        private string primary = string.Empty;
+        private string secondary = string.Empty;
 
 		public void AddDialog(ref DataGridView player_dgv) {
 			this.ShowDialog();
@@ -29,32 +29,8 @@ namespace LoLBalancing
                     numericUpDown_Div.Value.ToString(), primary, secondary, textBox_Duo.Text);
 				DataGridViewRow Player = player_dgv.Rows[player_dgv.Rows.Count - 1];
 				Player.Cells[0].Value = "X";
-				// Modify colors based on Ranking
-				switch (comboBox_Tier.Text) {
-					case MainForm.BRONZE:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.BRONZEHEX);
-						break;
-					case MainForm.SILVER:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.SILVERHEX);
-						break;
-					case MainForm.GOLD:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.GOLDHEX);
-						break;
-					case MainForm.PLATINUM:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.PLATHEX);
-						break;
-					case MainForm.DIAMOND:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.DIAMONDHEX);
-						break;
-					case MainForm.MASTER:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.MASTERHEX);
-						break;
-					case MainForm.CHALLENGER:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.CHALLENGERHEX);
-						break;
-					default:
-						break;
-				}
+                // Modify colors based on Ranking
+                Player.Cells[3].Style.BackColor = MainForm.RankToColor(comboBox_Tier.Text);
 				player_dgv.ClearSelection();
 			}
 		}
@@ -92,66 +68,50 @@ namespace LoLBalancing
                 Players.SelectedRows[0].Cells[7].Value = textBox_Duo.Text;
                 DataGridViewRow Player = Players.SelectedRows[0];
 				Player.Cells[0].Value = "X";
-				// Modify colors based on Ranking
-				switch (comboBox_Tier.Text) {
-                    case MainForm.BRONZE:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.BRONZEHEX);
-						break;
-					case MainForm.SILVER:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.SILVERHEX);
-						break;
-					case MainForm.GOLD:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.GOLDHEX);
-						break;
-					case MainForm.PLATINUM:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.PLATHEX);
-						break;
-					case MainForm.DIAMOND:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.DIAMONDHEX);
-						break;
-					case MainForm.MASTER:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.MASTERHEX);
-						break;
-					case MainForm.CHALLENGER:
-						Player.Cells[3].Style.BackColor = ColorTranslator.FromHtml(MainForm.CHALLENGERHEX);
-						break;
-					default:
-						break;
-				}
+                // Modify colors based on Ranking
+                Player.Cells[3].Style.BackColor = MainForm.RankToColor(comboBox_Tier.Text);
 				Players.ClearSelection();
 			}
 		}
 
 		private void button_OK_Click(object sender, EventArgs e) {
+            primary = string.Empty;
             foreach (Control c in groupBox_PrimaryRoles.Controls) {
                 RadioButton rb = (RadioButton)c;
                 if (rb.Checked) { primary = rb.Text; }
             }
+            secondary = string.Empty;
             foreach (Control c in groupBox_SecondaryRoles.Controls) {
                 CheckBox rb = (CheckBox)c;
                 if (rb.Checked) { secondary += ", " + rb.Text; }
             }
             secondary = secondary.TrimStart(',', ' ');
             // Do checks
+            string error_Message = string.Empty;
             if (string.IsNullOrWhiteSpace(textBox_Name.Text)) {
-                MessageBox.Show("Please provide a name for the Player", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                error_Message += "Please provide a name for the Player\n";
             }
-            else if (string.IsNullOrWhiteSpace(textBox_IGN.Text)) {
-                MessageBox.Show("Please provide a summoner IGN for the Player", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (string.IsNullOrWhiteSpace(textBox_IGN.Text)) {
+                error_Message += "Please provide a summoner IGN for the Player\n";
             }
-            else if (string.IsNullOrWhiteSpace(comboBox_Tier.Text)) {
-                MessageBox.Show("Please provide a Tier for the Player", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (string.IsNullOrWhiteSpace(comboBox_Tier.Text)) {
+                error_Message += "Please provide a Tier for the Player\n";
             }
-            else if (primary == secondary && primary != "Fill") {
-                MessageBox.Show("A Player should not have the same primary and secondary role.", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (string.IsNullOrWhiteSpace(primary)) {
+                error_Message += "Please select a primary role for the Player\n";
             }
-            else {
+            if (string.IsNullOrWhiteSpace(secondary)) {
+                error_Message += "Please provide secondary roles for the Player\n";
+            }
+            if (primary == secondary && primary != "Fill") {
+                error_Message += "A Player should not have the same primary and secondary role.\n";
+            }
+            if (string.IsNullOrWhiteSpace(error_Message)) {
                 button_pressed = true;
                 this.Close();
+            }
+            else {
+                MessageBox.Show(error_Message.TrimEnd('\n'), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 		}
     }

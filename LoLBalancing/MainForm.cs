@@ -28,61 +28,65 @@ namespace LoLBalancing
 
         // Variables for upgrading
         //static private bool upgrading = false;
-        private const string VERSION = "3.0";
+        private const string VERSION = "2.4";
 
         // Ranking consts
+        public const string IRON = "Iron";
         public const string BRONZE = "Bronze";
         public const string SILVER = "Silver";
         public const string GOLD = "Gold";
         public const string PLATINUM = "Platinum";
         public const string DIAMOND = "Diamond";
         public const string MASTER = "Master";
+        public const string GRANDMASTER = "Grandmaster";
         public const string CHALLENGER = "Challenger";
         public static readonly string[] TIER_LIST = 
-            { BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, MASTER, CHALLENGER };
+            { IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, MASTER, GRANDMASTER, CHALLENGER };
 
         // Color Codes for Ranks
         //public const string UNRANKHEX = "#B4A7D6";
-        public const string BRONZEHEX = "#9B5105";
-        public const string SILVERHEX = "#C0C0C0";
-        public const string GOLDHEX = "#F6B26B";
-        public const string PLATHEX = "#5CBFA1";
-        public const string DIAMONDHEX = "#A4C2F4";
-        public const string MASTERHEX = "#E5E5E5";
-        //public const string MASTERSHEX = "#FFD966";
-        public const string CHALLENGERHEX = "#FFD966";
+        public const string ERRORHEX = "#FF0000";
+        public const string IRONHEX = "#5E5354";
+        public const string BRONZEHEX = "#864029";
+        public const string SILVERHEX = "#849FA8";
+        public const string GOLDHEX = "#D3963D";
+        public const string PLATHEX = "#28B164";
+        public const string DIAMONDHEX = "#A3C2DD";
+        public const string MASTERHEX = "#C242C9";
+        public const string GRANDMASTERHEX = "#EE555A";
+        public const string CHALLENGERHEX = "#F5C085";
 
         // Current iteration of rank2pts value for balancing
         public static Dictionary<string, int> currRank2Pts = new Dictionary<string, int>();
         // Default dictionary of rank -> pt value
         public static Dictionary<string, int> DEFAULT_PLAYER2VALUE = new Dictionary<string, int>() {
-            { "Bronze 5", 1 },
-            { "Bronze 4", 2 },
-            { "Bronze 3", 3 },
-            { "Bronze 2", 4 },
-            { "Bronze 1", 5 },
-            { "Silver 5", 6 },
-            { "Silver 4", 7 },
-            { "Silver 3", 8 },
-            { "Silver 2", 9 },
-            { "Silver 1", 10 },
-            { "Gold 5", 11 },
-            { "Gold 4", 12 },
-            { "Gold 3", 13 },
-            { "Gold 2", 14 },
-            { "Gold 1", 15 },
-            { "Platinum 5", 16 },
+            { "Iron 4", 1 },
+            { "Iron 3", 2 },
+            { "Iron 2", 3 },
+            { "Iron 1", 4 },
+            { "Bronze 4", 5 },
+            { "Bronze 3", 6 },
+            { "Bronze 2", 7 },
+            { "Bronze 1", 8 },
+            { "Silver 4", 9 },
+            { "Silver 3", 10 },
+            { "Silver 2", 11 },
+            { "Silver 1", 12 },
+            { "Gold 4", 13 },
+            { "Gold 3", 14 },
+            { "Gold 2", 15 },
+            { "Gold 1", 16 },
             { "Platinum 4", 17 },
             { "Platinum 3", 18 },
             { "Platinum 2", 19 },
             { "Platinum 1", 20 },
-            { "Diamond 5", 21 },
-            { "Diamond 4", 22 },
-            { "Diamond 3", 23 },
-            { "Diamond 2", 24 },
-            { "Diamond 1", 25 },
-            { "Masters", 26 },
-            { "Challenger", 26 }
+            { "Diamond 4", 21 },
+            { "Diamond 3", 22 },
+            { "Diamond 2", 23 },
+            { "Diamond 1", 24 },
+            { "Master", 25 },
+            { "Grandmaster", 25 },
+            { "Challenger", 25 }
         };
 
         #endregion
@@ -104,33 +108,35 @@ namespace LoLBalancing
             }
         }
 
+        // Determine a ColorTranslator color baesd on the Ranking
+        public static Color RankToColor(string tier) {
+            switch (tier) {
+                case IRON:
+                    return ColorTranslator.FromHtml(IRONHEX);
+                case BRONZE:
+                    return ColorTranslator.FromHtml(BRONZEHEX);
+                case SILVER:
+                    return ColorTranslator.FromHtml(SILVERHEX);
+                case GOLD:
+                    return ColorTranslator.FromHtml(GOLDHEX);
+                case PLATINUM:
+                    return ColorTranslator.FromHtml(PLATHEX);
+                case DIAMOND:
+                    return ColorTranslator.FromHtml(DIAMONDHEX);
+                case MASTER:
+                    return ColorTranslator.FromHtml(MASTERHEX);
+                case GRANDMASTER:
+                    return ColorTranslator.FromHtml(GRANDMASTERHEX);
+                case CHALLENGER:
+                    return ColorTranslator.FromHtml(CHALLENGERHEX);
+                default:
+                    return ColorTranslator.FromHtml(ERRORHEX);
+            }
+        }
+
         // To fill in the background Cell color of a datagridview based on Ranking
         public static void FillCellColor(DataGridViewRow Row, int Ind, string Tier) {
-            switch (Tier) {
-                case BRONZE:
-                    Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(BRONZEHEX);
-                    break;
-                case SILVER:
-                    Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(SILVERHEX);
-                    break;
-                case GOLD:
-                    Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(GOLDHEX);
-                    break;
-                case PLATINUM:
-                    Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(PLATHEX);
-                    break;
-                case DIAMOND:
-                    Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(DIAMONDHEX);
-                    break;
-                case MASTER:
-                    Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(MASTERHEX);
-                    break;
-                case CHALLENGER:
-                    Row.Cells[Ind].Style.BackColor = ColorTranslator.FromHtml(CHALLENGERHEX);
-                    break;
-                default:
-                    break;
-            }
+            Row.Cells[Ind].Style.BackColor = RankToColor(Tier);
         }
 
         // Updates the label for total players
@@ -192,7 +198,7 @@ namespace LoLBalancing
             Properties.Settings.Default.pointsList = ptsList;
 
             StringBuilder sbSettings = new StringBuilder();
-            sbSettings.Append(numeric_DesThrshRange.Value + " ");       // [0] (int)
+            sbSettings.Append(numeric_DesThrshRange.Value + " ");   // [0] (int)
             sbSettings.Append(numeric_StartSeed.Value + " ");       // [1] (int)
             sbSettings.Append(checkBox_TrueRandom.Checked + " ");   // [2] (bool)
             sbSettings.Append(numeric_MaxChecks.Value + " ");       // [3] (int)
@@ -310,31 +316,7 @@ namespace LoLBalancing
                     xlWorkSheet.Cells[row, column] = playerRow.Cells[column++].Value.ToString();
                     string tier = playerRow.Cells[column].Value.ToString();
                     xlWorkSheet.Cells[row, column] = tier;
-                    switch (tier) {
-                        case BRONZE:
-                            xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(BRONZEHEX));
-                            break;
-                        case SILVER:
-                            xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(SILVERHEX));
-                            break;
-                        case GOLD:
-                            xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(GOLDHEX));
-                            break;
-                        case PLATINUM:
-                            xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(PLATHEX));
-                            break;
-                        case DIAMOND:
-                            xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(DIAMONDHEX));
-                            break;
-                        case MASTER:
-                            xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(MASTERHEX));
-                            break;
-                        case CHALLENGER:
-                            xlWorkSheet.Cells[row, column].Interior.Color = ColorTranslator.ToOle(ColorTranslator.FromHtml(CHALLENGERHEX));
-                            break;
-                        default:
-                            break;
-                    }
+                    xlWorkSheet.Cells[row, column].Interior.Color = RankToColor(tier);
                     xlWorkSheet.Cells[row, ++column] = playerRow.Cells[column++].Value.ToString();
                     xlWorkSheet.Cells[row, column] = playerRow.Cells[column++].Value.ToString();
                     xlWorkSheet.Cells[row, column] = playerRow.Cells[column++].Value.ToString();
@@ -443,13 +425,15 @@ namespace LoLBalancing
 
         // String -> Tier
         private static Dictionary<string, Tier> STRING_TO_TIER = new Dictionary<string, Tier>() {
+            { IRON, Tier.IRON },
             { BRONZE, Tier.BRONZE },
             { SILVER, Tier.SILVER },
             { GOLD, Tier.GOLD },
             { PLATINUM, Tier.PLATINUM },
             { DIAMOND, Tier.DIAMOND },
             { MASTER, Tier.MASTER },
-            { CHALLENGER, Tier.MASTER }
+            { GRANDMASTER, Tier.GRANDMASTER },
+            { CHALLENGER, Tier.CHALLENGER }
         };
 
         // String -> Role

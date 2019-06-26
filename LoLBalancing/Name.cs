@@ -7,7 +7,7 @@ namespace LoLBalancing
     [Serializable]
     public class Name : IEquatable<Name>
     {
-        public string name;
+        private string name;
 
         // Default ctor
         public Name() {
@@ -50,6 +50,11 @@ namespace LoLBalancing
         // It outputs the string instead of its base object
         public override string ToString() {
             return name;
+        }
+
+        // Sets name
+        public void SetName(string nameIn) {
+            name = nameIn;
         }
 
         // Override == and !=

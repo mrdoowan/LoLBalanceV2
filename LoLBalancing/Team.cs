@@ -7,12 +7,10 @@ namespace LoLBalancing
     class Team
     {
         private Dictionary<Role, Player> players;   // Players in this team. Size strictly 5
-        private int teamValue;                      // Combined rank value
 
         // Default ctor
         public Team() {
             players = new Dictionary<Role, Player>();
-            teamValue = 0;
         }
 
         // Init ctor
@@ -32,7 +30,6 @@ namespace LoLBalancing
             foreach (Player player in players.Values) {
                 combinedValue += player.rankValue();
             }
-            teamValue = combinedValue;
             return combinedValue;
         }
 
