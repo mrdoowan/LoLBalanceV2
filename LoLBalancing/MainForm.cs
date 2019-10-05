@@ -31,15 +31,15 @@ namespace LoLBalancing
         private const string VERSION = "2.4.1";
 
         // Ranking consts
-        public const string IRON = "Iron";
-        public const string BRONZE = "Bronze";
-        public const string SILVER = "Silver";
-        public const string GOLD = "Gold";
-        public const string PLATINUM = "Platinum";
-        public const string DIAMOND = "Diamond";
-        public const string MASTER = "Master";
-        public const string GRANDMASTER = "Grandmaster";
-        public const string CHALLENGER = "Challenger";
+        public const string IRON = "IRON";
+        public const string BRONZE = "BRONZE";
+        public const string SILVER = "SILVER";
+        public const string GOLD = "GOLD";
+        public const string PLATINUM = "PLATINUM";
+        public const string DIAMOND = "DIAMOND";
+        public const string MASTER = "MASTER";
+        public const string GRANDMASTER = "GRANDMASTER";
+        public const string CHALLENGER = "CHALLENGER";
         public static readonly string[] TIER_LIST = 
             { IRON, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, MASTER, GRANDMASTER, CHALLENGER };
 
@@ -60,33 +60,40 @@ namespace LoLBalancing
         public static Dictionary<string, int> currRank2Pts = new Dictionary<string, int>();
         // Default dictionary of rank -> pt value
         public static Dictionary<string, int> DEFAULT_PLAYER2VALUE = new Dictionary<string, int>() {
-            { "Iron 4", 1 },
-            { "Iron 3", 2 },
-            { "Iron 2", 3 },
-            { "Iron 1", 4 },
-            { "Bronze 4", 5 },
-            { "Bronze 3", 6 },
-            { "Bronze 2", 7 },
-            { "Bronze 1", 8 },
-            { "Silver 4", 9 },
-            { "Silver 3", 10 },
-            { "Silver 2", 11 },
-            { "Silver 1", 12 },
-            { "Gold 4", 13 },
-            { "Gold 3", 14 },
-            { "Gold 2", 15 },
-            { "Gold 1", 16 },
-            { "Platinum 4", 17 },
-            { "Platinum 3", 18 },
-            { "Platinum 2", 19 },
-            { "Platinum 1", 20 },
-            { "Diamond 4", 21 },
-            { "Diamond 3", 22 },
-            { "Diamond 2", 23 },
-            { "Diamond 1", 24 },
-            { "Master", 25 },
-            { "Grandmaster", 25 },
-            { "Challenger", 25 }
+            { IRON + " 4", 1 },
+            { IRON + " 3", 2 },
+            { IRON + " 2", 3 },
+            { IRON + " 1", 4 },
+            { BRONZE + " 4", 5 },
+            { BRONZE + " 3", 6 },
+            { BRONZE + " 2", 7 },
+            { BRONZE + " 1", 8 },
+            { SILVER + " 4", 9 },
+            { SILVER + " 3", 10 },
+            { SILVER + " 2", 11 },
+            { SILVER + " 1", 12 },
+            { GOLD + " 4", 13 },
+            { GOLD + " 3", 14 },
+            { GOLD + " 2", 15 },
+            { GOLD + " 1", 16 },
+            { PLATINUM + " 4", 17 },
+            { PLATINUM + " 3", 18 },
+            { PLATINUM + " 2", 19 },
+            { PLATINUM + " 1", 20 },
+            { DIAMOND + " 4", 21 },
+            { DIAMOND + " 3", 22 },
+            { DIAMOND + " 2", 23 },
+            { DIAMOND + " 1", 24 },
+            { MASTER, 25 },
+            { GRANDMASTER, 25 },
+            { CHALLENGER, 25 }
+        };
+
+        public static readonly Dictionary<string, int> ROMAN_TO_NUMBER = new Dictionary<string, int>() {
+            { "I", 1 },
+            { "II", 2 },
+            { "III", 3 },
+            { "IV", 4 }
         };
 
         #endregion
@@ -179,7 +186,7 @@ namespace LoLBalancing
             string[] balSetArr = balSetStr.Split(' ');
             try { numeric_DesThrshRange.Value = int.Parse(balSetArr[0]); } catch { }
             try { numeric_StartSeed.Value = int.Parse(balSetArr[1]); } catch { }
-            try { checkBox_TrueRandom.Checked = bool.Parse(balSetArr[2]); } catch { }
+            try { checkBox_RemoveAutofill.Checked = bool.Parse(balSetArr[2]); } catch { }
             try { numeric_MaxChecks.Value = int.Parse(balSetArr[3]); } catch { }
             try { checkBox_BestOutput.Checked = bool.Parse(balSetArr[4]); } catch { }
             try { numeric_Secondary.Value = int.Parse(balSetArr[5]); } catch { }
@@ -200,7 +207,7 @@ namespace LoLBalancing
             StringBuilder sbSettings = new StringBuilder();
             sbSettings.Append(numeric_DesThrshRange.Value + " ");   // [0] (int)
             sbSettings.Append(numeric_StartSeed.Value + " ");       // [1] (int)
-            sbSettings.Append(checkBox_TrueRandom.Checked + " ");   // [2] (bool)
+            sbSettings.Append(checkBox_RemoveAutofill.Checked + " ");   // [2] (bool)
             sbSettings.Append(numeric_MaxChecks.Value + " ");       // [3] (int)
             sbSettings.Append(checkBox_BestOutput.Checked + " ");   // [4] (bool)
             sbSettings.Append(numeric_Secondary.Value + " ");       // [5] (int)
@@ -453,17 +460,11 @@ namespace LoLBalancing
             richTextBox_Console.Clear();
 
             StartAlgo balanceFXN = new StartAlgo((int)numeric_DesThrshRange.Value, (int)numeric_StartSeed.Value,
-                (int)numeric_MaxChecks.Value, checkBox_TrueRandom.Checked, checkBox_WriteRange.Checked, checkBox_BestOutput.Checked);
+                (int)numeric_MaxChecks.Value, checkBox_RemoveAutofill.Checked, checkBox_WriteRange.Checked, checkBox_BestOutput.Checked);
             if (!balanceFXN.loadParamsFunction(dataGridView_Players,
                 (int)numeric_Secondary.Value, (int)numeric_AutoFill.Value, ref richTextBox_Console)) { return; }
             if (!balanceFXN.validateDuosFunction(ref richTextBox_Console)) { return; }
             if (!balanceFXN.balance(ref richTextBox_Console)) { return; }
-        }
-
-        // To enable/disable start seed value
-        private void checkBox_TrueRandom_CheckedChanged(object sender, EventArgs e) {
-            if (checkBox_TrueRandom.Checked) { numeric_StartSeed.Enabled = false; }
-            else { numeric_StartSeed.Enabled = true; }
         }
 
         // Write in Console log. Error is true if it forces an exit.

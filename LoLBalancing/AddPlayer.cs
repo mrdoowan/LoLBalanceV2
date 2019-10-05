@@ -14,7 +14,19 @@ namespace LoLBalancing
 	{
 		public AddPlayer() {
 			InitializeComponent();
-		}
+
+            comboBox_Tier.Items.Add(MainForm.IRON);
+            comboBox_Tier.Items.Add(MainForm.BRONZE);
+            comboBox_Tier.Items.Add(MainForm.SILVER);
+            comboBox_Tier.Items.Add(MainForm.GOLD);
+            comboBox_Tier.Items.Add(MainForm.PLATINUM);
+            comboBox_Tier.Items.Add(MainForm.DIAMOND);
+            comboBox_Tier.Items.Add(MainForm.MASTER);
+            comboBox_Tier.Items.Add(MainForm.GRANDMASTER);
+            comboBox_Tier.Items.Add(MainForm.CHALLENGER);
+
+
+        }
 
 		private bool button_pressed = false;
         private string primary = string.Empty;

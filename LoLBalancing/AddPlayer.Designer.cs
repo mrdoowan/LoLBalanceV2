@@ -89,16 +89,6 @@
             this.comboBox_Tier.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_Tier.FormattingEnabled = true;
             this.comboBox_Tier.IntegralHeight = false;
-            this.comboBox_Tier.Items.AddRange(new object[] {
-            "Iron",
-            "Bronze",
-            "Silver",
-            "Gold",
-            "Platinum",
-            "Diamond",
-            "Master",
-            "Grandmaster",
-            "Challenger"});
             this.comboBox_Tier.Location = new System.Drawing.Point(115, 65);
             this.comboBox_Tier.Name = "comboBox_Tier";
             this.comboBox_Tier.Size = new System.Drawing.Size(162, 23);

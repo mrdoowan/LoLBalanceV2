@@ -26,8 +26,8 @@
 		/// </summary>
 		private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.label1 = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
@@ -56,7 +56,7 @@
             this.numeric_Secondary = new System.Windows.Forms.NumericUpDown();
             this.numeric_AutoFill = new System.Windows.Forms.NumericUpDown();
             this.button_CustomPoints = new System.Windows.Forms.Button();
-            this.checkBox_TrueRandom = new System.Windows.Forms.CheckBox();
+            this.checkBox_RemoveAutofill = new System.Windows.Forms.CheckBox();
             this.checkBox_WriteRange = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -190,14 +190,14 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView_Players.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView_Players.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView_Players.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridView_Players.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView_Players.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.X_Col,
@@ -229,8 +229,8 @@
             // name_Col
             // 
             this.name_Col.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            this.name_Col.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            this.name_Col.DefaultCellStyle = dataGridViewCellStyle6;
             this.name_Col.HeaderText = "Name";
             this.name_Col.MinimumWidth = 120;
             this.name_Col.Name = "name_Col";
@@ -361,7 +361,7 @@
             this.groupBox_Setting.Controls.Add(this.numeric_Secondary);
             this.groupBox_Setting.Controls.Add(this.numeric_AutoFill);
             this.groupBox_Setting.Controls.Add(this.button_CustomPoints);
-            this.groupBox_Setting.Controls.Add(this.checkBox_TrueRandom);
+            this.groupBox_Setting.Controls.Add(this.checkBox_RemoveAutofill);
             this.groupBox_Setting.Controls.Add(this.checkBox_WriteRange);
             this.groupBox_Setting.Controls.Add(this.label7);
             this.groupBox_Setting.Controls.Add(this.label5);
@@ -438,16 +438,15 @@
             this.button_CustomPoints.UseVisualStyleBackColor = true;
             this.button_CustomPoints.Click += new System.EventHandler(this.button_CustomPoints_Click);
             // 
-            // checkBox_TrueRandom
+            // checkBox_RemoveAutofill
             // 
-            this.checkBox_TrueRandom.AutoSize = true;
-            this.checkBox_TrueRandom.Location = new System.Drawing.Point(6, 71);
-            this.checkBox_TrueRandom.Name = "checkBox_TrueRandom";
-            this.checkBox_TrueRandom.Size = new System.Drawing.Size(177, 17);
-            this.checkBox_TrueRandom.TabIndex = 7;
-            this.checkBox_TrueRandom.Text = "Truly randomize without seeding";
-            this.checkBox_TrueRandom.UseVisualStyleBackColor = true;
-            this.checkBox_TrueRandom.CheckedChanged += new System.EventHandler(this.checkBox_TrueRandom_CheckedChanged);
+            this.checkBox_RemoveAutofill.AutoSize = true;
+            this.checkBox_RemoveAutofill.Location = new System.Drawing.Point(6, 71);
+            this.checkBox_RemoveAutofill.Name = "checkBox_RemoveAutofill";
+            this.checkBox_RemoveAutofill.Size = new System.Drawing.Size(135, 17);
+            this.checkBox_RemoveAutofill.TabIndex = 7;
+            this.checkBox_RemoveAutofill.Text = "Remove AutoFill option";
+            this.checkBox_RemoveAutofill.UseVisualStyleBackColor = true;
             // 
             // checkBox_WriteRange
             // 
@@ -681,7 +680,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.CheckBox checkBox_WriteRange;
-        private System.Windows.Forms.CheckBox checkBox_TrueRandom;
+        private System.Windows.Forms.CheckBox checkBox_RemoveAutofill;
         private System.Windows.Forms.Button button_CustomPoints;
         private System.Windows.Forms.CheckBox checkBox_BestOutput;
         private System.Windows.Forms.NumericUpDown numeric_Secondary;

@@ -23,15 +23,15 @@ namespace LoLBalancing
         private int threshold;
         private int startSeed;
         private int maxChecks;
-        private bool trueRandom;
+        private bool noAutoFill;
         private bool writeRangeConsole;
         private bool bestOutput;
         // Init ctor
-        public StartAlgo(int thresh_, int seed_, int checks_, bool rand_, bool writeRange_, bool best_) {
+        public StartAlgo(int thresh_, int seed_, int checks_, bool noAuto_, bool writeRange_, bool best_) {
             threshold = thresh_;
             startSeed = seed_;
             maxChecks = checks_;
-            trueRandom = rand_;
+            noAutoFill = noAuto_;
             writeRangeConsole = writeRange_;
             bestOutput = best_;
         }
@@ -91,6 +91,7 @@ namespace LoLBalancing
             try {
                 foreach (DataGridViewRow playerRow in dgv_Roster.Rows) {
                     playerName = playerRow.Cells[1].Value.ToString();
+
                     string ignStr = playerRow.Cells[2].Value.ToString();
                     if (string.IsNullOrWhiteSpace(ignStr)) {
                         string msg = playerName + " should not have a blank IGN.";
@@ -98,19 +99,24 @@ namespace LoLBalancing
                         inputsPerfect = false;
                     }
                     Name playerIGN = new Name(playerRow.Cells[2].Value.ToString());
+
                     string tierStr = playerRow.Cells[3].Value.ToString();
                     if (!MainForm.TIER_LIST.Any(tierStr.Contains)) {
                         string msg = playerIGN + " does not have a valid Tier name.";
                         write_ConsoleLog(msg, ref rtb);
                         inputsPerfect = false;
                     }
-                    Tier playerTier = STRING_TO_TIER[tierStr];
-                    int playerDiv = int.Parse(playerRow.Cells[4].Value.ToString());
+                    Tier playerTier = STRING_TO_TIER[tierStr.ToUpper()];
+
+                    string divString = playerRow.Cells[4].Value.ToString();
+                    int playerDiv = (MainForm.ROMAN_TO_NUMBER.ContainsKey(divString)) ?
+                        MainForm.ROMAN_TO_NUMBER[divString] : int.Parse(playerRow.Cells[4].Value.ToString());
                     if (playerDiv < MIN_DIV || playerDiv > MAX_DIV) {
                         string msg = playerIGN + " does not have a division between " + MIN_DIV + "-" + MAX_DIV + ".";
                         write_ConsoleLog(msg, ref rtb);
                         inputsPerfect = false;
                     }
+
                     string priStr = playerRow.Cells[5].Value.ToString();
                     if (!ROLE_LIST.Any(priStr.Contains)) {
                         string msg = playerIGN + " does not have a valid primary role.";
@@ -118,6 +124,7 @@ namespace LoLBalancing
                         inputsPerfect = false;
                     }
                     Role playerPri = STRING_TO_ROLE[playerRow.Cells[5].Value.ToString()];
+
                     string[] secondRoles = playerRow.Cells[6].Value.ToString().Split(',');
                     List<Role> playerSecs = new List<Role>();
                     foreach (string secRole in secondRoles) {
@@ -224,8 +231,8 @@ namespace LoLBalancing
                         string msg = summonerName + " and " + duoIGN +
                             ": Both duos had the same primary role.";
                         write_ConsoleLog(msg, ref rtb);
-                        Player selPlayer = randomNumber(1, 2, 0, false) == 1 ? origPlayer : duoPlayer;
-                        int selIndex = randomNumber(0, selPlayer.secondRoles.Count, 0, false);
+                        Player selPlayer = randomNumber(1, 2, 0) == 1 ? origPlayer : duoPlayer;
+                        int selIndex = randomNumber(0, selPlayer.secondRoles.Count, 0);
                         selPlayer.primaryRole = selPlayer.secondRoles[selIndex];
                         selPlayer.secondRoles.RemoveAt(selIndex);
                         if (selPlayer.secondRoles.Count == 0) {
@@ -339,14 +346,26 @@ namespace LoLBalancing
                 }
                 // MASTER-LOOP END
 
-                // Validation: Should hopefully never occur
+                bool breakLoop = false;
                 foreach (List<Player> roleList in assignRoleList.Values) {
+                    // If No AutoFill option is selected, check masterList if there is an AutoFill. If so, skip
+                    if (noAutoFill) {
+                        foreach (Player player in roleList) {
+                            if (player.isAutoFilled()) {
+                                breakLoop = true;
+                                string msg = "Seed " + randSeed + " has an Autofill";
+                                write_ConsoleLog(msg, ref rtb);
+                            }
+                        }
+                    }
+                    // Validation: Should hopefully never occur
                     if (roleList.Count != numTeams) {
                         string msg = "ERROR - assignRoleList does not have " + numTeams + " teams. It might be impossible to form a Balance.";
                         write_ConsoleLog(msg, ref rtb);
                         return false;
                     }
                 }
+                if (breakLoop) { continue; }
 
                 // Initialize the Balance abstract
                 Balance currBalance = new Balance(assignRoleList, out lowestSeedRange);
@@ -429,7 +448,7 @@ namespace LoLBalancing
                     string msg = "Lowest range in Seed " + randSeed + ": " + lowestSeedRange;
                     write_ConsoleLog(msg, ref rtb);
                 }
-                if (!bestOutput && lowestSeedRange <= threshold) {
+                if (!bestOutput && lowestSeedRange == threshold) {
                     DialogResult resultBox = MessageBox.Show("A balance was found with a Range of " + lowestSeedRange + " at seed " + randSeed +
                         ".\nWould you like to close and save it? Pressing No continues the balance.",
                         "Finished", MessageBoxButtons.YesNoCancel);
@@ -477,8 +496,8 @@ namespace LoLBalancing
         }
 
         // Rolls a uniform random number between min and max
-        private int randomNumber(int min, int max, int seedVal, bool notPseudo) {
-            Random rnd = (notPseudo) ? new Random() : new Random(seedVal);
+        private int randomNumber(int min, int max, int seedVal) {
+            Random rnd = new Random(seedVal);
             return rnd.Next(min, max);
         }
 
@@ -543,8 +562,8 @@ namespace LoLBalancing
                 }
             }
             // Pick selSecInd based on if ValidInd has more than 0 indices
-            int selSecInd = (validInd.Count > 0) ? validInd[randomNumber(0, validInd.Count - 1, randSeed, trueRandom)] :
-                randomNumber(0, player.secondRoles.Count - 1, randSeed, trueRandom);
+            int selSecInd = (validInd.Count > 0) ? validInd[randomNumber(0, validInd.Count - 1, randSeed)] :
+                randomNumber(0, player.secondRoles.Count - 1, randSeed);
             return player.secondRoles[selSecInd];
         }
 
@@ -563,8 +582,8 @@ namespace LoLBalancing
             }
             Player changePlayer = new Player();
             int index = (primary) ?
-                randomNumber(0, roleList.Count - 1, randSeed, trueRandom) :
-                randomNumber(0, roleSecList.Count - 1, randSeed, trueRandom);
+                randomNumber(0, roleList.Count - 1, randSeed) :
+                randomNumber(0, roleSecList.Count - 1, randSeed);
             changePlayer = (primary) ? roleList[index] : roleSecList[index];
             return changePlayer;
         }
@@ -609,7 +628,7 @@ namespace LoLBalancing
                 }
                 while (playerPool.Count > 0) {
                     // Check here to make sure that selected player (swapping in their role into) is not in the same role as their duo
-                    int randomNum = randomNumber(0, playerPool.Count - 1, seedVal, trueRandom);
+                    int randomNum = randomNumber(0, playerPool.Count - 1, seedVal);
                     Player selPlayer = playerPool[randomNum];
                     if (!containsName(assignRoleList[swappingPlayer.assignedRole], selPlayer.duo)) {
                         return selPlayer;
